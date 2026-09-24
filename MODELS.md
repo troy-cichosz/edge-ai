@@ -49,15 +49,23 @@ The wishlist is an evaluation queue, not a commitment to download every candidat
 ## Current Verified Inventory
 
 The workstation currently has:
-- Ollama `0.34.2`;
-- `llama3.1:8b` (4.9 GB);
-- `gemma3:4b` (3.3 GB).
+- Ollama 0.34.2;
+- llama3.1:8b (4.9 GB);
+- gemma3:4b (3.3 GB).
 
 These are the starting local models and are not yet selected defaults for any agent role.
 
 ## Hardware Constraint
 
-The first benchmark target is the existing Windows workstation with its local Ollama installation. Model fit must be measured by actual coding performance and resource behavior, not only by whether a model technically loads.
+The current workstation has 12 GB of RTX 3060 VRAM and approximately 28 GB of system RAM, but normal Windows desktop workloads consume a material portion of both resources.
+
+The current baseline measurement showed approximately:
+- 5.78 GB free RTX 3060 VRAM;
+- 8.3 GB free system RAM.
+
+These figures are not hard model-size limits. They establish the starting point for measuring GPU-only inference, GPU/system-RAM offloading, latency, memory pressure, and task quality.
+
+The workstation's Intel Xeon E3-1270 v5 does not provide integrated graphics, so the benchmark plan must not assume that desktop applications can be moved to an integrated GPU to free RTX 3060 VRAM.
 
 ## Benchmark Rule
 

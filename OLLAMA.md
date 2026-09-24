@@ -2,20 +2,37 @@
 
 ## Installation
 
-Ollama is already installed on the development workstation. `edge-ai` does not install or replace Ollama as part of normal repository setup.
+Ollama is already installed on the development workstation. edge-ai does not install or replace Ollama as part of normal repository setup.
 
 ## Verification
 
 The workstation baseline has been verified locally:
 
-- Ollama version: `0.34.2`
-- `llama3.1:8b` — 4.9 GB
-- `gemma3:4b` — 3.3 GB
+- Ollama version: 0.34.2
+- llama3.1:8b — 4.9 GB
+- gemma3:4b — 3.3 GB
 
 The exact installed Ollama version and available model inventory should remain benchmark evidence rather than being assumed from documentation. Re-run the verification commands when the workstation baseline changes:
 
     ollama --version
     ollama list
+
+## Workstation Resource Baseline
+
+The current benchmark workstation is a Dell Precision Tower 3620 with:
+
+- Intel Xeon E3-1270 v5 @ 3.60 GHz;
+- 4 cores / 8 logical processors;
+- 27.9 GB visible system RAM;
+- NVIDIA GeForce RTX 3060 with 12 GB VRAM;
+- NVIDIA driver 591.86;
+- CUDA 13.1 reported by nvidia-smi.
+
+At the baseline measurement, approximately 8.3 GB of system RAM and 5.78 GB of RTX 3060 VRAM were free while normal Windows applications were running.
+
+The workstation's Xeon E3-1270 v5 does not provide integrated graphics. The motherboard video outputs therefore cannot be treated as an available second GPU for offloading desktop graphics workloads.
+
+Memory measurements are point-in-time evidence. Benchmark runs should record resource usage before and after each candidate model test.
 
 ## Baseline Endpoint
 
@@ -27,7 +44,9 @@ Model pulls are explicit workstation operations. Model cache data does not belon
 
 ## Resource Policy
 
-Only a controlled number of inference workloads should run concurrently. Before selecting benchmark candidates, establish the workstation CPU, system RAM, GPU/VRAM, driver, and available storage baseline. Initial benchmarking should then measure VRAM/RAM pressure, latency, context behavior, and task quality.
+Only a controlled number of inference workloads should run concurrently. Benchmark candidates should be evaluated for GPU VRAM usage, system RAM pressure, CPU utilization, latency, context behavior, and repository-task quality.
+
+Large quantized models may be tested even when they exceed available GPU VRAM, provided the resulting GPU/system-RAM offloading behavior is measured and the workstation remains operational.
 
 ## Failure Handling
 
