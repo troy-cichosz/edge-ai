@@ -1,0 +1,34 @@
+version: 1
+
+roles:
+  human:
+    authority: final
+  chatgpt:
+    purpose: architecture_requirements_review
+  coding:
+    purpose: scoped_implementation
+    requires_issue_scope: true
+    requires_repository_instructions: true
+    requires_diff_review: true
+    requires_tests: true
+  compliance:
+    purpose: independent_rules_review
+    independent_from_coding_agent: true
+    blocks_handoff_on_failure: true
+  testing_review:
+    purpose: independent_verification
+    independent_from_coding_agent: true
+
+handoff:
+  sequence:
+    - task_scope
+    - repository_context
+    - coding
+    - compliance
+    - testing_review
+    - human_acceptance
+
+security:
+  allow_unrestricted_filesystem: false
+  allow_secret_access: false
+  allow_direct_public_push: false
