@@ -67,7 +67,7 @@ The coding agent must preserve the existing architecture and working behavior un
 
 ## Repository workflow
 
-```text
+```
 Human / ChatGPT
       |
       v
@@ -102,17 +102,19 @@ The local AI environment does not bypass GitHub source control, repository instr
 
 ## Current status
 
-Initial repository structure is being established.
+Initial repository structure and governance are established.
 
-The first implementation increment is intentionally small:
-1. establish repository contracts and architecture;
-2. verify the existing Ollama installation;
-3. define model-selection and resource policy;
-4. establish agent configuration;
-5. establish controlled local execution;
-6. benchmark candidate coding models on the workstation;
-7. validate a coding agent against a small real task;
-8. add independent compliance and testing stages.
+The next implementation increment is intentionally small and begins with the **existing Ollama installation**, not a new installation:
+1. verify the installed Ollama version and local model inventory;
+2. establish the workstation/GPU resource baseline;
+3. identify and benchmark candidate local models for the defined agent roles;
+4. select model-to-role and resource policy from observed benchmark results;
+5. establish controlled local agent execution;
+6. validate a coding agent against a low-risk real repository task;
+7. add independent compliance and testing stages;
+8. document the resulting operating procedure.
+
+Ollama installation itself is already complete on the baseline Windows workstation. Reinstallation or replacement is not part of this increment unless verification identifies a concrete problem.
 
 ## Security
 
