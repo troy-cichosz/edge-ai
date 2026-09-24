@@ -1,0 +1,44 @@
+trigger:
+  - '*.*'
+
+pool: 'Linux x86 64bit'
+
+variables:
+  - group: 'GitHub'
+
+jobs:
+  - job: PublishPublic
+    displayName: 'Publish edge-ai chatgpt to GitHub public'
+    pool:
+      name: 'Linux x86 64bit'
+    steps:
+      - checkout: self
+
+      - task: Bash@3
+        displayName: 'Prepare public branch'
+        inputs:
+          targetType: inline
+          script: |
+            set -euo pipefail
+            git config user.name "$(gitUID)"
+            git config user.email "edge-ai@spoocannon.com"
+            git checkout --orphan public
+            git rm --cached -r . || true
+            git clean -fdx
+            git add .
+            git commit -m "$(gitCommit)"
+
+      - task: InstallSSHKey@0
+        displayName: 'Install GitHub SSH key'
+        inputs:
+          knownHostsEntry: '$(known_hosts_entry)'
+          sshPublicKey: '$(git_pk)'
+          sshKeySecureFile: '$(secFile)'
+
+      - task: CmdLine@2
+        displayName: 'Push public branch to GitHub'
+        inputs:
+          script: |
+            set -euo pipefail
+            ssh-keyscan -t $(keyID) github.com >> ~/.ssh/known_hosts
+            git push git@github.com:$(gitUID)/edge-ai.git HEAD:refs/heads/public --force --tags
