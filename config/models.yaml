@@ -1,0 +1,28 @@
+version: 1
+
+defaults:
+  inference_provider: ollama
+  max_concurrent_jobs: 1
+  require_local_inference: true
+  allow_paid_hosted_ai: false
+
+roles:
+  coding:
+    status: benchmark_pending
+    candidates: []
+  compliance:
+    status: benchmark_pending
+    candidates: []
+  testing_review:
+    status: benchmark_pending
+    candidates: []
+  planning:
+    status: benchmark_pending
+    candidates: []
+
+policy:
+  select_by_benchmark: true
+  require_real_repository_task: true
+  require_independent_review: true
+  preserve_architecture: true
+  prohibit_unsolicited_rewrite: true
