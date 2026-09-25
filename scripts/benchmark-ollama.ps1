@@ -22,6 +22,7 @@ $payload = @{
     model = $Model
     prompt = "Reply with exactly one sentence stating that this is a controlled local model benchmark."
     stream = $false
+    think = $false
     options = @{
         num_predict = $MaxTokens
     }
@@ -49,6 +50,8 @@ $elapsed = ($end - $start).TotalSeconds
     GenerationSeconds = if ($response.eval_duration) { [math]::Round($response.eval_duration / 1e9, 3) } else { $null }
     PromptTokensPerSecond = if ($response.prompt_eval_duration -gt 0) { [math]::Round($response.prompt_eval_count / ($response.prompt_eval_duration / 1e9), 2) } else { $null }
     GenerationTokensPerSecond = if ($response.eval_duration -gt 0) { [math]::Round($response.eval_count / ($response.eval_duration / 1e9), 2) } else { $null }
+    ThinkingTokens = if ($response.thinking) { ($response.thinking -split "\s+" | Where-Object { $_ }).Count } else { 0 }
+    ResponseCharacters = if ($null -ne $response.response) { $response.response.Length } else { 0 }
 }
 
 Write-Host "`nResponse:"
