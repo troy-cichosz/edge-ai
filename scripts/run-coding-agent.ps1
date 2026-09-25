@@ -17,7 +17,7 @@ Set-StrictMode -Version Latest
 
 $repoRoot = (Get-Location).Path
 $repoRootFull = [System.IO.Path]::GetFullPath($repoRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
-$utf8NoBom = $utf8NoBom
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 
 function Get-SafeRelativePath {
     param([Parameter(Mandatory = $true)][string]$Path)
