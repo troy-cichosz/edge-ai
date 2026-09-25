@@ -197,6 +197,31 @@ The temporary reconstructed worktree was kept separate from the real development
 
 
 
+### qwen3:14b — TASK-003
+
+TASK-003 was executed against a reconstructed fixture because the original recorded benchmark starting commit `9aee2dbd8c3d8585812b60fe5300b55131369fb4` is no longer reachable from the GitHub or ADO `chatgpt` history. The fixture was derived from the current clean `chatgpt` state by changing only the documented target sentence backward to the TASK-003 precondition. This is not evidence that the historical commit itself was executed.
+
+The reconstructed fixture was verified before the coding run:
+
+- only `MODELS.md` was modified;
+- the diff contained only the documented one-sentence reverse change;
+- `git diff --check` passed;
+- the target precondition was present.
+
+qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. Independent inspection of the resulting diff showed that it did not preserve the file:
+
+- the requested sentence replacement was present;
+- unrelated existing “Calabri” text was corrupted;
+- the final newline was removed;
+- the model incorrectly reported that only the requested sentence had changed;
+- `git diff --check` passed despite the semantic corruption and missing final newline.
+
+Result: **Failed TASK-003.** This is an end-to-end coding-agent failure involving file preservation and inaccurate self-validation. The evidence establishes the unacceptable final repository state for this controlled run; it does not by itself establish whether the encoding corruption originated solely in model output or was introduced/altered by the runner/tool path.
+
+The temporary reconstructed worktree was separate from the real development checkout, and the real `chatgpt` checkout remained clean throughout the test.
+
+
+
 ### gpt-oss:20b — Runtime
 
 Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchmark harness was configured with `think=false` so that the final response was measured separately from model reasoning output.
