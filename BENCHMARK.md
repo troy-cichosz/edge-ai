@@ -149,6 +149,28 @@ Required change:
 
 TASK-003 therefore produced no accepted implementation from any candidate. The observed Llama and Devstral failures include both preservation/instruction-adherence defects and inaccurate self-validation. These observations are evidence about the tested runs; they do not establish a general property of all uses of the models.
 
+### qwen3:14b — Runtime and TASK-003
+
+Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchmark harness was configured with `think=false` so that the final response was measured separately from model reasoning output.
+
+| Metric | Result |
+|---|---:|
+| Wall clock | 4.164 s |
+| Load | 0.005 s |
+| Prompt tokens | 31 |
+| Prompt evaluation | 3.885 s |
+| Generated tokens | 9 |
+| Generation time | 0.240 s |
+| Generation rate | 37.47 tok/s |
+| Thinking tokens | 0 |
+| Response | Correct |
+
+The earlier qwen3:14b run produced an empty visible `response` while generating 128 tokens. That run is not used as the corrected runtime result because the benchmark harness was subsequently changed to disable thinking and record the separate thinking field.
+
+TASK-003 was then run from the clean benchmark starting state. qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. The required sentence replacement was not present in the resulting diff. Instead, the existing “Calabri” text was corrupted and the final newline was removed. The model then incorrectly reported that only the requested sentence had changed. The working tree was restored to the clean starting state after inspection.
+
+Result: **Failed TASK-003.** The runtime generation result is valid, but the tested coding-agent run did not satisfy the repository write-boundary, preservation, or self-validation requirements. The evidence does not by itself distinguish which portion of the encoding transformation originated in the model versus the tool/runner path; it does establish that the end-to-end coding-agent result was unacceptable for the controlled task.
+
 No model is selected as a coding, compliance, testing/review, or planning default as a result of these tasks.
 
 ## Phase 3 — Independent Review
