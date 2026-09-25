@@ -415,17 +415,28 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
     }
 
     $assistantMessage = $response.message
+
+    $assistantContent = ""
+    $contentProperty = $assistantMessage.PSObject.Properties["content"]
+    if ($null -ne $contentProperty -and $null -ne $contentProperty.Value) {
+        $assistantContent = [string]$contentProperty.Value
+    }
+
+    $toolCalls = @()
+    $toolCallsProperty = $assistantMessage.PSObject.Properties["tool_calls"]
+    if ($null -ne $toolCallsProperty -and $null -ne $toolCallsProperty.Value) {
+        $toolCalls = @($toolCallsProperty.Value)
+    }
+
     $messages += @{
         role = "assistant"
-        content = if ($null -ne $assistantMessage.content) { [string]$assistantMessage.content } else { "" }
-        tool_calls = if ($null -ne $assistantMessage.tool_calls) { $assistantMessage.tool_calls } else { @() }
+        content = $assistantContent
+        tool_calls = $toolCalls
     }
 
-    if ($assistantMessage.content) {
-        Write-Host $assistantMessage.content
+    if ($assistantContent) {
+        Write-Host $assistantContent
     }
-
-    $toolCalls = @($assistantMessage.tool_calls)
 
     if ($toolCalls.Count -eq 0) {
         Write-Host ""
