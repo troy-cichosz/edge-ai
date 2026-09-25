@@ -85,6 +85,58 @@ The task is to add a new README section titled **Benchmarking** that:
 
 The model must inspect the complete final file and Git diff and report any validation it could not perform.
 
+## Controlled Repository Task Results
+
+The controlled repository tasks below were run from the benchmark baseline commit:
+
+- Starting commit: `9aee2dbd8c3d8585812b60fe5300b55131369fb4`
+- Repository: `troy-cichosz/edge-ai`
+- Development branch: `chatgpt`
+- Public branch: not modified
+- Working tree was restored to a clean state between model runs.
+- The coding-agent runner version used for these final runs was from the `chatgpt` development history after the benchmark baseline; harness changes were recorded separately from model behavior.
+
+### TASK-001 — Scoped Repository Documentation Change
+
+All three current candidates failed to complete TASK-001.
+
+| Model | Result | Evidence |
+|---|---|---|
+| gemma3:4b | Failed | Native tool calling is unsupported; controlled text fallback did not produce the required file operation. No repository change. |
+| llama3.1:8b | Failed | Native tool capability was available, but the model returned a textual pseudo-tool call instead of a structured tool call. No repository change. |
+| devstral-small-2:latest | Failed | Structured tool use succeeded for repository inspection, but the model stopped before performing the required `write_file`. No repository change. |
+
+Earlier runner/harness defects encountered during development were corrected and are not counted as model-performance failures. The final Devstral TASK-001 run demonstrated that the structured tool path was operational.
+
+### TASK-002 — Verified Model Inventory Documentation Change
+
+TASK-002 was introduced because TASK-001 did not exercise an actual completed repository write for any candidate.
+
+| Model | Result | Evidence |
+|---|---|---|
+| gemma3:4b | Failed | Native tool calling is unsupported; controlled text fallback did not produce the required file operation. No repository change. |
+| llama3.1:8b | Failed | The model produced a textual pseudo-`write_file` call rather than executing the structured operation. Its proposed content was also inconsistent with the requested inventory. No repository change. |
+| devstral-small-2:latest | Failed | Structured repository reads succeeded, but the model attempted to select itself as the coding model despite an explicit prohibition and never executed `write_file`. No repository change. |
+
+### TASK-003 — Minimal Write-Boundary Test
+
+TASK-003 deliberately reduced the repository task to one sentence replacement in `MODELS.md` so that actual write capability, preservation of unrelated content, and validation accuracy could be evaluated independently of broader documentation reasoning.
+
+Required change:
+
+- Replace `These are the starting local models and are not yet selected defaults for any agent role.`
+- With `These are the currently verified local models and are not yet selected defaults for any agent role.`
+
+| Model | Structured tools | Result | Evidence |
+|---|---|---|---|
+| gemma3:4b | No native tool calling | Failed | Controlled text fallback did not produce the required write operation. Working tree remained clean. |
+| llama3.1:8b | Yes | Failed | Executed structured `write_file`, but replaced the entire 72-line `MODELS.md` with one sentence. The model then incorrectly reported that only the requested sentence had changed. The working tree was restored. |
+| devstral-small-2:latest | Yes | Failed | Executed structured `write_file`, but introduced unrelated encoding corruption in the existing “Calabri” text and removed the final newline in addition to the requested sentence change. The model then incorrectly reported that there were no other changes. The working tree was restored. |
+
+TASK-003 therefore produced no accepted implementation from any candidate. The observed Llama and Devstral failures include both preservation/instruction-adherence defects and inaccurate self-validation. These observations are evidence about the tested runs; they do not establish a general property of all uses of the models.
+
+No model is selected as a coding, compliance, testing/review, or planning default as a result of these tasks.
+
 ## Phase 3 — Independent Review
 
 A separate review invocation/model must inspect each coding result against:
