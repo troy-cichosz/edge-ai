@@ -249,6 +249,16 @@ The final visible response was correct. Runtime evidence is valid for this run; 
 
 No model is selected as a coding, compliance, testing/review, or planning default as a result of these tasks.
 
+### Harness correction — 2026-09-25
+
+The TASK-003 runs for qwen3:14b and gpt-oss:20b, as well as the earlier devstral-small-2:latest run, exposed the same class of unrelated Unicode corruption and final-newline loss during complete-file replacement. Because the tested models shared the same coding-agent runner and repository read/write path, the end-to-end results cannot safely attribute that corruption to the models alone.
+
+The runner was therefore inspected before continuing the candidate sequence. The repository read path used PowerShell `Get-Content -Raw` without an explicit encoding. On Windows PowerShell 5.1, BOM-less UTF-8 files are read using the system's default ANSI code page when no encoding is specified. This is incompatible with the repository's UTF-8 text files and is a credible common-path cause of the observed corruption. The runner has been corrected to use an explicit UTF-8, no-BOM .NET reader for repository text and the existing explicit UTF-8, no-BOM writer for file replacement.
+
+This harness correction is committed on GitHub `chatgpt` and must be validated with an isolated read/write preservation test before additional model benchmarking. No `public` branch was modified.
+
+Until that validation and a clean rerun of the affected TASK-003 runs, the observed model-specific preservation conclusions remain **end-to-end observations under the previous runner**, not isolated evidence about model capability.
+
 ## Phase 3 — Independent Review
 
 A separate review invocation/model must inspect each coding result against:
@@ -288,17 +298,17 @@ Do not assign an overall score or ranking. The evidence determines whether a can
 
 ## Execution Order
 
-The initial candidates have completed the current benchmark procedure:
+The initial candidates have completed the current benchmark procedure under the earlier harness:
 
 1. gemma3:4b
 2. llama3.1:8b
 3. devstral-small-2:latest
 
-The next candidate set should be run one model at a time using the same runtime and repository-task procedure:
+The next candidate set should be resumed only after the corrected runner passes the isolated text-preservation validation. Because qwen3:14b and gpt-oss:20b were tested before that correction, rerun those two candidates first from clean reconstructed fixtures. Do not proceed to qwen3-coder:30b until the affected runs have been repeated under the corrected harness.
 
-1. qwen3:14b
-2. gpt-oss:20b
-3. qwen3-coder:30b
+1. qwen3:14b — rerun TASK-003
+2. gpt-oss:20b — rerun TASK-003
+3. qwen3-coder:30b — then test if the corrected harness remains clean
 
 Do not select a role default from the new candidates based on model size, vendor, or reputation. Record runtime behavior first, then run the controlled repository task from the same clean starting state, inspect the resulting diff, and complete independent review.
 
@@ -332,7 +342,8 @@ The benchmark establishes evidence. It does not automatically select a coding mo
 A model becomes a role candidate only after:
 
 1. runtime behavior is measured;
-2. TASK-001 is completed from the same starting state;
+2. the coding-agent harness passes its current preservation validation;
+3. the applicable repository task is completed from the same starting state;
 3. the resulting diff is inspected;
 4. independent review is completed;
 5. failures and unverified behavior are recorded.
