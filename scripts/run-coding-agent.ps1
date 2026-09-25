@@ -17,6 +17,7 @@ Set-StrictMode -Version Latest
 
 $repoRoot = (Get-Location).Path
 $repoRootFull = [System.IO.Path]::GetFullPath($repoRoot).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+$utf8NoBom = $utf8NoBom
 
 function Get-SafeRelativePath {
     param([Parameter(Mandatory = $true)][string]$Path)
@@ -62,6 +63,16 @@ function Assert-WriteAllowed {
     return $relative
 }
 
+function Read-Utf8File {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        throw "File not found: $Path"
+    }
+
+    return [System.IO.File]::ReadAllText($Path, $utf8NoBom)
+}
+
 function Invoke-RepoTool {
     param(
         [Parameter(Mandatory = $true)][string]$Name,
@@ -90,7 +101,7 @@ function Invoke-RepoTool {
                 throw "File not found: $relative"
             }
 
-            return Get-Content -LiteralPath $full -Raw
+            return Read-Utf8File $full
         }
 
         "git_status" {
@@ -248,7 +259,7 @@ function Invoke-TextModeAgent {
         if (-not (Test-Path -LiteralPath $full -PathType Leaf)) {
             throw "Required task context file not found: $relative"
         }
-        $content = Get-Content -LiteralPath $full -Raw
+        $content = Read-Utf8File $full
         $contextParts += "===== $relative =====`n$content`n===== END $relative ====="
     }
 
