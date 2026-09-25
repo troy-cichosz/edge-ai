@@ -460,6 +460,7 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
 
         $messages += @{
             role = "tool"
+            tool_name = $name
             content = $toolContent
         }
 
