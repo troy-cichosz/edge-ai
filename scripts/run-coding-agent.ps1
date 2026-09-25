@@ -387,14 +387,23 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         options = @{
             temperature = 0
         }
-    } | ConvertTo-Json -Depth 30
+    } | ConvertTo-Json -Depth 30 -Compress
+
+    try {
+        $null = $payload | ConvertFrom-Json
+    }
+    catch {
+        throw "Native tool-mode generated invalid JSON payload: $($_.Exception.Message)"
+    }
+
+    $payloadBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
 
     try {
         $response = Invoke-RestMethod `
             -Uri "$OllamaUrl/api/chat" `
             -Method Post `
-            -ContentType "application/json" `
-            -Body $payload
+            -ContentType "application/json; charset=utf-8" `
+            -Body $payloadBytes
     }
     catch {
         $errorText = @(
