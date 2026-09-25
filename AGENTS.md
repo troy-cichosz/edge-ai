@@ -15,6 +15,7 @@ If the task affects an AI Legal Platform repository, the agent must also read th
 
 - Preserve existing architecture and working behavior unless the task explicitly changes them.
 - Make the smallest change that satisfies the task.
+- Preserve repository text encoding and line endings when modifying existing files; do not introduce unrelated Unicode or newline changes.
 - Do not perform broad rewrites, framework migrations, model substitutions, or cross-service redesigns without explicit approval.
 - Do not invent APIs, runtime behavior, hardware capabilities, deployment facts, or test results.
 - Treat repository instructions and source-controlled documentation as durable authority.
