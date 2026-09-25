@@ -171,6 +171,32 @@ TASK-003 was then run from the clean benchmark starting state. qwen3:14b used th
 
 Result: **Failed TASK-003.** The runtime generation result is valid, but the tested coding-agent run did not satisfy the repository write-boundary, preservation, or self-validation requirements. The evidence does not by itself distinguish which portion of the encoding transformation originated in the model versus the tool/runner path; it does establish that the end-to-end coding-agent result was unacceptable for the controlled task.
 
+
+### gpt-oss:20b — Runtime
+
+Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchmark harness was configured with `think=false` so that the final response was measured separately from model reasoning output.
+
+| Metric | Result |
+|---|---:|
+| Wall clock | 84.687 s |
+| Load | 57.540 s |
+| Prompt tokens | 77 |
+| Prompt evaluation | 23.140 s |
+| Generated tokens | 114 |
+| Generation time | 3.993 s |
+| Generation rate | 28.55 tok/s |
+| Thinking tokens | 82* |
+| Response | Correct |
+| Ollama placement | 24% CPU / 76% GPU |
+| Ollama context | 4096 |
+| NVIDIA VRAM after run | 12010 MiB / 12288 MiB |
+
+\* The benchmark script's `ThinkingTokens` field is a whitespace-split diagnostic count of the returned thinking text, not an Ollama tokenizer count.
+
+The model loaded successfully but required CPU/system-RAM offloading because its Ollama-reported model size is approximately 14 GB while the workstation has a 12 GB RTX 3060. Ollama reports the tested placement as 24% CPU / 76% GPU. The post-run NVIDIA measurement showed 12010 MiB of 12288 MiB VRAM in use. System-RAM peak was not captured during this run, so it remains unverified.
+
+The final visible response was correct. Runtime evidence is valid for this run; it does not by itself establish suitability for a coding-agent role.
+
 No model is selected as a coding, compliance, testing/review, or planning default as a result of these tasks.
 
 ## Phase 3 — Independent Review
