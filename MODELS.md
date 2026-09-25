@@ -49,11 +49,12 @@ The wishlist is an evaluation queue, not a commitment to download every candidat
 ## Current Verified Inventory
 
 The workstation currently has:
-- Ollama 0.34.2;
-- llama3.1:8b (4.9 GB);
-- gemma3:4b (3.3 GB).
+- Ollama 0.34.4;
+- gemma3:4b;
+- llama3.1:8b;
+- devstral-small-2:latest.
 
-These are the starting local models and are not yet selected defaults for any agent role.
+These are the currently verified local models and are not yet selected defaults for any agent role.
 
 ## Hardware Constraint
 
