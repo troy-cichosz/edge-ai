@@ -284,19 +284,27 @@ function Invoke-TextModeAgent {
         prompt = $textPrompt
         stream = $false
         options = @{ temperature = 0 }
-    } | ConvertTo-Json -Depth 30
+    } | ConvertTo-Json -Depth 30 -Compress
 
+    try {
+        $null = $payload | ConvertFrom-Json
+    }
+    catch {
+        throw "Text-mode fallback generated invalid JSON payload: $($_.Exception.Message)"
+    }
+
+    $payloadBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
     $response = Invoke-RestMethod `
         -Uri "$OllamaUrl/api/generate" `
         -Method Post `
-        -ContentType "application/json" `
-        -Body $payload
+        -ContentType "application/json; charset=utf-8" `
+        -Body $payloadBytes
 
-    if ($null -eq $response.message -or [string]::IsNullOrWhiteSpace($response.response)) {
+    if ($null -eq $response -or [string]::IsNullOrWhiteSpace($response.response)) {
         throw "Ollama text-mode fallback returned no response."
     }
 
-    $output = [string]$response.message.content
+    $output = [string]$response.response
     $pathMatch = [regex]::Match($output, [regex]::Escape($pathMarker) + "s*(?<path>[^
 ]+)")
     $beginIndex = $output.IndexOf($beginMarker, [System.StringComparison]::Ordinal)
