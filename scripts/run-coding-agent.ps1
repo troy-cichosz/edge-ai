@@ -238,65 +238,47 @@ $tools = @(
     }
 )
 
+function Invoke-TextModeAgent {
+    $contextPaths = @("README.md", "AGENTS.md", "ARCHITECTURE.md", "DECISIONS.md", "MODELS.md", "OLLAMA.md")
+    $contextParts = @()
 
-function Get-TextModeContext {
-    $matches = [regex]::Matches($Task, '(?m)^\s*-\s+([A-Za-z0-9_./-]+(?:\.md|\.txt|\.yaml|\.yml|\.json|\.ps1))\s*
-You are the coding agent for a controlled local repository task.
-
-Repository root: $repoRoot
-Model under test: $Model
-
-You have access only to repository-scoped tools supplied by this runner.
-You cannot commit, push, access .git, or access files outside the repository.
-Write access is limited to these explicitly authorized paths:
-$($allowedWrites.Keys -join ", ")
-
-You must follow the task exactly. Do not make improvements, refactors, cleanup, or unrelated documentation changes.
-
-Before editing, inspect the repository context required by the task. Use read_file for complete files, not partial guesses.
-
-After editing:
-- read the complete changed file;
-- inspect git status;
-- inspect git diff;
-- run git_diff_check;
-- report exact changed files;
-- report validation performed;
-- report anything you could not verify.
-
-Do not claim a validation result you did not obtain from a tool.
-Do not commit or push.
-"@
-
-$messages = @(
-    @{
-        role = "system"
-        content = $systemPrompt
-    },
-    @{
-        role = "user"
-        content = $Task
+    foreach ($path in $contextPaths) {
+        $relative = Get-SafeRelativePath $path
+        $full = Join-Path $repoRoot $relative
+        if (-not (Test-Path -LiteralPath $full -PathType Leaf)) {
+            throw "Required task context file not found: $relative"
+        }
+        $content = Get-Content -LiteralPath $full -Raw
+        $contextParts += "===== $relative =====`n$content`n===== END $relative ====="
     }
-)
 
-Write-Host "=== Local Coding Agent ===" -ForegroundColor Cyan
-Write-Host "Model: $Model"
-Write-Host "Repository: $repoRoot"
-Write-Host "Authorized writes: $(if ($allowedWrites.Count) { $allowedWrites.Keys -join ', ' } else { '(none)' })"
-Write-Host "Max turns: $MaxTurns"
-Write-Host ""
-
-for ($turn = 1; $turn -le $MaxTurns; $turn++) {
-    Write-Host "--- Turn $turn ---" -ForegroundColor DarkCyan
+    $context = $contextParts -join "`n`n"
+    $textPrompt = @(
+        "You are a controlled coding agent operating without native tool calling.",
+        "Repository root: $repoRoot",
+        "Model under test: $Model",
+        "You cannot access files or execute commands. The required repository files are supplied as read-only context.",
+        "You may replace only this authorized path: $($allowedWrites.Keys -join ", ")",
+        "Follow the TASK exactly. Do not make unrelated changes.",
+        "Return JSON with exactly two properties: path and content.",
+        "path must be an authorized repository-relative path.",
+        "content must be the complete final contents of that file, not a patch.",
+        "",
+        $Task,
+        "",
+        "REPOSITORY CONTEXT:",
+        $context
+    ) -join "`n"
 
     $payload = @{
         model = $Model
-        messages = $messages
+        messages = @(
+            @{ role = "system"; content = "Return only valid JSON. Do not use markdown fences." }
+            @{ role = "user"; content = $textPrompt }
+        )
         stream = $false
-        tools = $tools
-        options = @{
-            temperature = 0
-        }
+        format = "json"
+        options = @{ temperature = 0 }
     } | ConvertTo-Json -Depth 30
 
     try {
@@ -310,186 +292,13 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         if ($_.Exception.Message -match "does not support tools") {
             Write-Host "Model does not support native tool calling; switching to controlled text mode." -ForegroundColor Yellow
             Invoke-TextModeAgent
-            exit 0
+            break
         }
-
         throw
     }
 
-    if ($null -eq $response.message) {
-        throw "Ollama returned no message."
-    }
-
-    $assistantMessage = $response.message
-    $messages += @{
-        role = "assistant"
-        content = if ($null -ne $assistantMessage.content) { [string]$assistantMessage.content } else { "" }
-        tool_calls = if ($null -ne $assistantMessage.tool_calls) { $assistantMessage.tool_calls } else { @() }
-    }
-
-    if ($assistantMessage.content) {
-        Write-Host $assistantMessage.content
-    }
-
-    $toolCalls = @($assistantMessage.tool_calls)
-
-    if ($toolCalls.Count -eq 0) {
-        Write-Host ""
-        Write-Host "Agent completed without further tool calls."
-        break
-    }
-
-    foreach ($call in $toolCalls) {
-        $name = [string]$call.function.name
-        $arguments = $call.function.arguments
-
-        Write-Host "Tool: $name" -ForegroundColor Gray
-
-        try {
-            $toolResult = Invoke-RepoTool -Name $name -Arguments $arguments
-            $toolContent = if ($null -eq $toolResult) { "" } else { [string]$toolResult }
-        }
-        catch {
-            $toolContent = "ERROR: $($_.Exception.Message)"
-        }
-
-        $messages += @{
-            role = "tool"
-            content = $toolContent
-        }
-
-        if ($toolContent.Length -gt 1000) {
-            Write-Host "$($toolContent.Substring(0, 1000))..." -ForegroundColor DarkGray
-        }
-        else {
-            Write-Host $toolContent -ForegroundColor DarkGray
-        }
-    }
-
-    if ($turn -eq $MaxTurns) {
-        throw "Maximum agent turns reached before the model completed."
-    }
-}
-
-Write-Host ""
-Write-Host "=== Final Working Tree ===" -ForegroundColor Cyan
-$status = & git -C $repoRoot status --short
-if ($LASTEXITCODE -ne 0) {
-    throw "Final git status failed."
-}
-if ($status) {
-    $status | Write-Host
-}
-else {
-    Write-Host "(clean working tree)"
-}
-
-Write-Host ""
-Write-Host "=== Final Diff ===" -ForegroundColor Cyan
-$diff = & git -C $repoRoot diff --no-ext-diff -- .
-if ($LASTEXITCODE -ne 0) {
-    throw "Final git diff failed."
-}
-if ($diff) {
-    $diff | Write-Host
-}
-else {
-    Write-Host "(no working-tree diff)"
-}
-)
-    $paths = @($matches | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-
-    if ($paths.Count -eq 0) {
-        throw "Text-mode fallback could not determine the repository files required by the task."
-    }
-
-    $sections = @()
-    foreach ($path in $paths) {
-        $relative = Get-SafeRelativePath $path
-        $full = Join-Path $repoRoot $relative
-
-        if (-not (Test-Path -LiteralPath $full -PathType Leaf)) {
-            throw "Required task context file not found: $relative"
-        }
-
-        $content = Get-Content -LiteralPath $full -Raw
-        $sections += "===== $relative =====`n$content`n===== END $relative ====="
-    }
-
-    return ($sections -join "`n`n")
-}
-
-function Invoke-TextModeAgent {
-    $context = Get-TextModeContext
-
-    $writeSchema = @{
-        type = "object"
-        properties = @{
-            path = @{
-                type = "string"
-                description = "Repository-relative path to the single authorized file to replace."
-            }
-            content = @{
-                type = "string"
-                description = "Complete replacement UTF-8 contents of the authorized file."
-            }
-        }
-        required = @("path", "content")
-        additionalProperties = $false
-    }
-
-    $textSystem = @"
-You are a controlled coding agent operating without native tool calling.
-
-Repository root: $repoRoot
-Model under test: $Model
-
-You cannot access files, execute commands, commit, or push.
-The repository files required by the task are supplied below as read-only context.
-Write access is performed by the runner only after your response is validated.
-You may replace only explicitly authorized paths:
-$($allowedWrites.Keys -join ", ")
-
-Follow the task exactly. Do not make improvements, refactors, cleanup, or unrelated changes.
-
-Return JSON matching the supplied schema:
-- path: the one authorized repository-relative file to replace;
-- content: its complete final contents.
-
-The content must be a complete file, not a patch.
-"@
-
-    $textUser = @"
-$Task
-
-REPOSITORY CONTEXT:
-
-$context
-
-Return only the JSON object required by the response schema.
-"@
-
-    $payload = @{
-        model = $Model
-        messages = @(
-            @{ role = "system"; content = $textSystem }
-            @{ role = "user"; content = $textUser }
-        )
-        stream = $false
-        format = $writeSchema
-        options = @{
-            temperature = 0
-        }
-    } | ConvertTo-Json -Depth 30
-
-    $response = Invoke-RestMethod `
-        -Uri "$OllamaUrl/api/chat" `
-        -Method Post `
-        -ContentType "application/json" `
-        -Body $payload
-
     if ($null -eq $response.message -or [string]::IsNullOrWhiteSpace($response.message.content)) {
-        throw "Ollama text-mode fallback returned no structured response."
+        throw "Ollama text-mode fallback returned no response."
     }
 
     try {
@@ -505,98 +314,8 @@ Return only the JSON object required by the response schema.
     }
 
     $full = Join-Path $repoRoot $relative
-    [System.IO.File]::WriteAllText(
-        $full,
-        [string]$result.content,
-        [System.Text.UTF8Encoding]::new($false)
-    )
-
+    [System.IO.File]::WriteAllText($full, [string]$result.content, [System.Text.UTF8Encoding]::new($false))
     Write-Host "Text-mode fallback wrote $relative" -ForegroundColor Gray
-
-    $finalContent = Get-Content -LiteralPath $full -Raw
-    $status = & git -C $repoRoot status --short
-    if ($LASTEXITCODE -ne 0) {
-        throw "Final git status failed during text-mode validation."
-    }
-
-    $diff = & git -C $repoRoot diff --no-ext-diff -- .
-    if ($LASTEXITCODE -ne 0) {
-        throw "Final git diff failed during text-mode validation."
-    }
-
-    $reviewSchema = @{
-        type = "object"
-        properties = @{
-            summary = @{ type = "string" }
-            changed_files = @{
-                type = "array"
-                items = @{ type = "string" }
-            }
-            validation = @{
-                type = "array"
-                items = @{ type = "string" }
-            }
-            warnings = @{
-                type = "array"
-                items = @{ type = "string" }
-            }
-        }
-        required = @("summary", "changed_files", "validation", "warnings")
-        additionalProperties = $false
-    }
-
-    $reviewUser = @"
-Review the completed TASK-001 result using only the evidence supplied below.
-
-TASK:
-$Task
-
-FINAL README:
-===== README.md =====
-$finalContent
-===== END README.md =====
-
-GIT STATUS:
-$status
-
-GIT DIFF:
-$diff
-
-Report:
-- concise summary;
-- exact changed files shown by git status;
-- validation you can establish from the supplied evidence;
-- anything you could not independently verify.
-
-Do not propose or make further changes.
-Return only the JSON object required by the response schema.
-"@
-
-    $reviewPayload = @{
-        model = $Model
-        messages = @(
-            @{ role = "system"; content = "You are performing the final read-only validation report for a controlled coding task. Do not claim commands were run unless their results are supplied." }
-            @{ role = "user"; content = $reviewUser }
-        )
-        stream = $false
-        format = $reviewSchema
-        options = @{
-            temperature = 0
-        }
-    } | ConvertTo-Json -Depth 30
-
-    $reviewResponse = Invoke-RestMethod `
-        -Uri "$OllamaUrl/api/chat" `
-        -Method Post `
-        -ContentType "application/json" `
-        -Body $reviewPayload
-
-    if ($null -eq $reviewResponse.message -or [string]::IsNullOrWhiteSpace($reviewResponse.message.content)) {
-        throw "Ollama text-mode validation returned no response."
-    }
-
-    Write-Host "=== Text-Mode Validation ===" -ForegroundColor Cyan
-    Write-Host $reviewResponse.message.content
 }
 
 $systemPrompt = @"
