@@ -8,9 +8,10 @@ Ollama is already installed on the development workstation. edge-ai does not ins
 
 The workstation baseline has been verified locally:
 
-- Ollama version: 0.34.2
-- llama3.1:8b — 4.9 GB
-- gemma3:4b — 3.3 GB
+- Ollama version: 0.34.4
+- gemma3:4b
+- llama3.1:8b
+- devstral-small-2:latest
 
 The exact installed Ollama version and available model inventory should remain benchmark evidence rather than being assumed from documentation. Re-run the verification commands when the workstation baseline changes:
 
