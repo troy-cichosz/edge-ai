@@ -297,10 +297,10 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         }
     } | ConvertTo-Json -Depth 30
 
-    $response = Invoke-RestMethod \`
-        -Uri "$OllamaUrl/api/chat" \`
-        -Method Post \`
-        -ContentType "application/json" \`
+    $response = Invoke-RestMethod `
+        -Uri "$OllamaUrl/api/chat" `
+        -Method Post `
+        -ContentType "application/json" `
         -Body $payload
 
     if ($null -eq $response.message) {
