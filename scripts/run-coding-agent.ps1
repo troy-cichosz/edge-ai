@@ -281,21 +281,11 @@ function Invoke-TextModeAgent {
         options = @{ temperature = 0 }
     } | ConvertTo-Json -Depth 30
 
-    try {
-        $response = Invoke-RestMethod `
-            -Uri "$OllamaUrl/api/chat" `
-            -Method Post `
-            -ContentType "application/json" `
-            -Body $payload
-    }
-    catch {
-        if ($_.Exception.Message -match "does not support tools") {
-            Write-Host "Model does not support native tool calling; switching to controlled text mode." -ForegroundColor Yellow
-            Invoke-TextModeAgent
-            break
-        }
-        throw
-    }
+    $response = Invoke-RestMethod `
+        -Uri "$OllamaUrl/api/chat" `
+        -Method Post `
+        -ContentType "application/json" `
+        -Body $payload
 
     if ($null -eq $response.message -or [string]::IsNullOrWhiteSpace($response.message.content)) {
         throw "Ollama text-mode fallback returned no response."
@@ -377,11 +367,21 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         }
     } | ConvertTo-Json -Depth 30
 
-    $response = Invoke-RestMethod `
-        -Uri "$OllamaUrl/api/chat" `
-        -Method Post `
-        -ContentType "application/json" `
-        -Body $payload
+    try {
+        $response = Invoke-RestMethod `
+            -Uri "$OllamaUrl/api/chat" `
+            -Method Post `
+            -ContentType "application/json" `
+            -Body $payload
+    }
+    catch {
+        if ($_.Exception.Message -match "does not support tools") {
+            Write-Host "Model does not support native tool calling; switching to controlled text mode." -ForegroundColor Yellow
+            Invoke-TextModeAgent
+            break
+        }
+        throw
+    }
 
     if ($null -eq $response.message) {
         throw "Ollama returned no message."
