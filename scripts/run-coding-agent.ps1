@@ -253,6 +253,10 @@ function Invoke-TextModeAgent {
     }
 
     $context = $contextParts -join "`n`n"
+    $pathMarker = "__EDGE_AI_FILE_PATH__"
+    $beginMarker = "__EDGE_AI_FILE_CONTENT_BEGIN__"
+    $endMarker = "__EDGE_AI_FILE_CONTENT_END__"
+
     $textPrompt = @(
         "You are a controlled coding agent operating without native tool calling.",
         "Repository root: $repoRoot",
@@ -260,9 +264,14 @@ function Invoke-TextModeAgent {
         "You cannot access files or execute commands. The required repository files are supplied as read-only context.",
         "You may replace only this authorized path: $($allowedWrites.Keys -join ", ")",
         "Follow the TASK exactly. Do not make unrelated changes.",
-        "Return JSON with exactly two properties: path and content.",
-        "path must be an authorized repository-relative path.",
-        "content must be the complete final contents of that file, not a patch.",
+        "Return exactly this plain-text structure and nothing else:",
+        $pathMarker,
+        "README.md",
+        $beginMarker,
+        "<complete final file contents>",
+        $endMarker,
+        "Do not use markdown fences or add commentary.",
+        "The file contents must be complete, not a patch.",
         "",
         $Task,
         "",
@@ -273,24 +282,10 @@ function Invoke-TextModeAgent {
     $payload = @{
         model = $Model
         messages = @(
-            @{ role = "system"; content = "Return only valid JSON. Do not use markdown fences." }
+            @{ role = "system"; content = "Return only the requested marker-delimited file content. Do not add commentary." }
             @{ role = "user"; content = $textPrompt }
         )
         stream = $false
-        format = @{
-            type = "object"
-            properties = @{
-                path = @{
-                    type = "string"
-                    description = "Authorized repository-relative path."
-                }
-                content = @{
-                    type = "string"
-                    description = "Complete final contents of the authorized file."
-                }
-            }
-            required = @("path", "content")
-        }
         options = @{ temperature = 0 }
     } | ConvertTo-Json -Depth 30
 
@@ -304,23 +299,32 @@ function Invoke-TextModeAgent {
         throw "Ollama text-mode fallback returned no response."
     }
 
-    try {
-        $result = $response.message.content | ConvertFrom-Json
-    }
-    catch {
-        throw "Ollama text-mode fallback returned invalid JSON: $($_.Exception.Message)"
+    $output = [string]$response.message.content
+    $pathMatch = [regex]::Match($output, [regex]::Escape($pathMarker) + "s*(?<path>[^
+]+)")
+    $beginIndex = $output.IndexOf($beginMarker, [System.StringComparison]::Ordinal)
+    $endIndex = $output.IndexOf($endMarker, [System.StringComparison]::Ordinal)
+
+    if (-not $pathMatch.Success) {
+        throw "Ollama text-mode fallback did not return the required path marker."
     }
 
-    $relative = Assert-WriteAllowed ([string]$result.path)
-    if ([string]::IsNullOrWhiteSpace([string]$result.content)) {
+    if ($beginIndex -lt 0 -or $endIndex -lt 0 -or $endIndex -le ($beginIndex + $beginMarker.Length)) {
+        throw "Ollama text-mode fallback did not return valid content markers."
+    }
+
+    $relative = Assert-WriteAllowed $pathMatch.Groups["path"].Value.Trim()
+    $contentStart = $beginIndex + $beginMarker.Length
+    $fileContent = $output.Substring($contentStart, $endIndex - $contentStart).TrimStart("`r", "`n")
+
+    if ([string]::IsNullOrWhiteSpace($fileContent)) {
         throw "Ollama text-mode fallback returned empty file content."
     }
 
     $full = Join-Path $repoRoot $relative
-    [System.IO.File]::WriteAllText($full, [string]$result.content, [System.Text.UTF8Encoding]::new($false))
+    [System.IO.File]::WriteAllText($full, $fileContent, [System.Text.UTF8Encoding]::new($false))
     Write-Host "Text-mode fallback wrote $relative" -ForegroundColor Gray
 }
-
 $systemPrompt = @"
 You are the coding agent for a controlled local repository task.
 
