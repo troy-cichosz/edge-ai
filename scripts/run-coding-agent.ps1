@@ -277,7 +277,20 @@ function Invoke-TextModeAgent {
             @{ role = "user"; content = $textPrompt }
         )
         stream = $false
-        format = "json"
+        format = @{
+            type = "object"
+            properties = @{
+                path = @{
+                    type = "string"
+                    description = "Authorized repository-relative path."
+                }
+                content = @{
+                    type = "string"
+                    description = "Complete final contents of the authorized file."
+                }
+            }
+            required = @("path", "content")
+        }
         options = @{ temperature = 0 }
     } | ConvertTo-Json -Depth 30
 
