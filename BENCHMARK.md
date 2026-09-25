@@ -44,6 +44,20 @@ Before Devstral Small 2 was installed, the same Ollama API measurement produced:
 
 These are historical measurements. Re-run them under the controlled benchmark procedure before making direct performance comparisons.
 
+## Next Candidate Set
+
+The initial three candidates have now been measured through runtime and repository-task phases. Additional candidates may therefore be evaluated.
+
+The next controlled candidate set is:
+
+- `qwen3:14b` — approximately 9.3 GB in Ollama; Qwen3 provides native tool support and includes dense and MoE variants.
+- `gpt-oss:20b` — approximately 14 GB in Ollama; the model provides native function calling and structured-output capabilities.
+- `qwen3-coder:30b` — approximately 19 GB in Ollama; this coding-focused MoE model has 30B total parameters with approximately 3.3B active parameters and native tool-calling support.
+
+These candidates are an evaluation set, not a ranking or selection. Pull and benchmark them one at a time. Do not keep multiple large candidates loaded concurrently.
+
+The workstation has approximately 27.9 GB visible system RAM and approximately 16.1 GB free at the current idle baseline. The `qwen3-coder:30b` and `gpt-oss:20b` candidates are therefore expected to require meaningful CPU/system-RAM offloading on this workstation; measure actual behavior rather than assuming feasibility from model size.
+
 ## Phase 2 — Repository Task
 
 Use a clean working copy of the exact edge-ai chatgpt benchmark starting commit.
@@ -176,13 +190,19 @@ Do not assign an overall score or ranking. The evidence determines whether a can
 
 ## Execution Order
 
-Run the three current candidates using the same procedure:
+The initial candidates have completed the current benchmark procedure:
 
 1. gemma3:4b
 2. llama3.1:8b
 3. devstral-small-2:latest
 
-Do not pull additional models until these candidates have been measured against TASK-001.
+The next candidate set should be run one model at a time using the same runtime and repository-task procedure:
+
+1. qwen3:14b
+2. gpt-oss:20b
+3. qwen3-coder:30b
+
+Do not select a role default from the new candidates based on model size, vendor, or reputation. Record runtime behavior first, then run the controlled repository task from the same clean starting state, inspect the resulting diff, and complete independent review.
 
 ## Runtime Measurement Command
 
