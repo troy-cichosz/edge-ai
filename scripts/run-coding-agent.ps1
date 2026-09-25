@@ -281,21 +281,18 @@ function Invoke-TextModeAgent {
 
     $payload = @{
         model = $Model
-        messages = @(
-            @{ role = "system"; content = "Return only the requested marker-delimited file content. Do not add commentary." }
-            @{ role = "user"; content = $textPrompt }
-        )
+        prompt = $textPrompt
         stream = $false
         options = @{ temperature = 0 }
     } | ConvertTo-Json -Depth 30
 
     $response = Invoke-RestMethod `
-        -Uri "$OllamaUrl/api/chat" `
+        -Uri "$OllamaUrl/api/generate" `
         -Method Post `
         -ContentType "application/json" `
         -Body $payload
 
-    if ($null -eq $response.message -or [string]::IsNullOrWhiteSpace($response.message.content)) {
+    if ($null -eq $response.message -or [string]::IsNullOrWhiteSpace($response.response)) {
         throw "Ollama text-mode fallback returned no response."
     }
 
