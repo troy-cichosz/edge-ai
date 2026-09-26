@@ -57,11 +57,11 @@ Those remain authoritative in the project and service repositories.
 ## Agent roles
 
 The initial role model is:
-1. **Human** — final authority and operational control.
-2. **ChatGPT** — architecture, requirements, cross-repository reasoning, and review.
-3. **Coding Agent** — implements an explicitly scoped task using local models/tools.
-4. **Rules/Compliance Agent** — independently checks adherence after implementation.
-5. **Testing/Review Agents** — test and inspect behavior independently.
+1. **Human** - final authority and operational control.
+2. **ChatGPT** - architecture, requirements, cross-repository reasoning, and review.
+3. **Coding Agent** - implements an explicitly scoped task using local models/tools.
+4. **Rules/Compliance Agent** - independently checks adherence after implementation.
+5. **Testing/Review Agents** - test and inspect behavior independently.
 
 The coding agent must preserve the existing architecture and working behavior unless an explicitly approved task changes them. Broad unsolicited rewrites are prohibited.
 

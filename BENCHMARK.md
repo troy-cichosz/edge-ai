@@ -14,7 +14,7 @@ Verified on 2026-09-25:
 
 The workstation is running Ollama 0.34.4. The RTX 3060 12 GB is dedicated to local AI/CUDA workloads and the AMD FirePro W4100 drives Windows displays. The workstation has approximately 27.9 GB visible system RAM and approximately 16.1 GB free at the current idle baseline.
 
-## Phase 1 — Runtime Baseline
+## Phase 1 - Runtime Baseline
 
 For each model, record:
 
@@ -50,21 +50,21 @@ The initial three candidates have now been measured through runtime and reposito
 
 The next controlled candidate set is:
 
-- `qwen3:14b` — approximately 9.3 GB in Ollama; Qwen3 provides native tool support and includes dense and MoE variants.
-- `gpt-oss:20b` — approximately 14 GB in Ollama; the model provides native function calling and structured-output capabilities.
-- `qwen3-coder:30b` — approximately 19 GB in Ollama; this coding-focused MoE model has 30B total parameters with approximately 3.3B active parameters and native tool-calling support.
+- `qwen3:14b` - approximately 9.3 GB in Ollama; Qwen3 provides native tool support and includes dense and MoE variants.
+- `gpt-oss:20b` - approximately 14 GB in Ollama; the model provides native function calling and structured-output capabilities.
+- `qwen3-coder:30b` - approximately 19 GB in Ollama; this coding-focused MoE model has 30B total parameters with approximately 3.3B active parameters and native tool-calling support.
 
 These candidates are an evaluation set, not a ranking or selection. Pull and benchmark them one at a time. Do not keep multiple large candidates loaded concurrently.
 
 The workstation has approximately 27.9 GB visible system RAM and approximately 16.1 GB free at the current idle baseline. The `qwen3-coder:30b` and `gpt-oss:20b` candidates are therefore expected to require meaningful CPU/system-RAM offloading on this workstation; measure actual behavior rather than assuming feasibility from model size.
 
-## Phase 2 — Repository Task
+## Phase 2 - Repository Task
 
 Use a clean working copy of the exact edge-ai chatgpt benchmark starting commit.
 
 The first controlled task is:
 
-### TASK-001 — Scoped Repository Documentation Change
+### TASK-001 - Scoped Repository Documentation Change
 
 Make a small, real change to edge-ai that tests repository comprehension, instruction adherence, documentation consistency, and change discipline without changing runtime behavior.
 
@@ -110,7 +110,7 @@ The controlled repository tasks below were run from the benchmark baseline commi
 - Working tree was restored to a clean state between model runs.
 - The coding-agent runner version used for these final runs was from the `chatgpt` development history after the benchmark baseline; harness changes were recorded separately from model behavior.
 
-### TASK-001 — Scoped Repository Documentation Change
+### TASK-001 - Scoped Repository Documentation Change
 
 All three current candidates failed to complete TASK-001.
 
@@ -122,7 +122,7 @@ All three current candidates failed to complete TASK-001.
 
 Earlier runner/harness defects encountered during development were corrected and are not counted as model-performance failures. The final Devstral TASK-001 run demonstrated that the structured tool path was operational.
 
-### TASK-002 — Verified Model Inventory Documentation Change
+### TASK-002 - Verified Model Inventory Documentation Change
 
 TASK-002 was introduced because TASK-001 did not exercise an actual completed repository write for any candidate.
 
@@ -132,7 +132,7 @@ TASK-002 was introduced because TASK-001 did not exercise an actual completed re
 | llama3.1:8b | Failed | The model produced a textual pseudo-`write_file` call rather than executing the structured operation. Its proposed content was also inconsistent with the requested inventory. No repository change. |
 | devstral-small-2:latest | Failed | Structured repository reads succeeded, but the model attempted to select itself as the coding model despite an explicit prohibition and never executed `write_file`. No repository change. |
 
-### TASK-003 — Minimal Write-Boundary Test
+### TASK-003 - Minimal Write-Boundary Test
 
 TASK-003 deliberately reduced the repository task to one sentence replacement in `MODELS.md` so that actual write capability, preservation of unrelated content, and validation accuracy could be evaluated independently of broader documentation reasoning.
 
@@ -145,11 +145,11 @@ Required change:
 |---|---|---|---|
 | gemma3:4b | No native tool calling | Failed | Controlled text fallback did not produce the required write operation. Working tree remained clean. |
 | llama3.1:8b | Yes | Failed | Executed structured `write_file`, but replaced the entire 72-line `MODELS.md` with one sentence. The model then incorrectly reported that only the requested sentence had changed. The working tree was restored. |
-| devstral-small-2:latest | Yes | Failed | Executed structured `write_file`, but introduced unrelated encoding corruption in the existing “Calabri” text and removed the final newline in addition to the requested sentence change. The model then incorrectly reported that there were no other changes. The working tree was restored. |
+| devstral-small-2:latest | Yes | Failed | Executed structured `write_file`, but introduced unrelated encoding corruption in the existing "Calabri" text and removed the final newline in addition to the requested sentence change. The model then incorrectly reported that there were no other changes. The working tree was restored. |
 
 TASK-003 therefore produced no accepted implementation from any candidate. The observed Llama and Devstral failures include both preservation/instruction-adherence defects and inaccurate self-validation. These observations are evidence about the tested runs; they do not establish a general property of all uses of the models.
 
-### qwen3:14b — Runtime and TASK-003
+### qwen3:14b - Runtime and TASK-003
 
 Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchmark harness was configured with `think=false` so that the final response was measured separately from model reasoning output.
 
@@ -167,12 +167,12 @@ Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchma
 
 The earlier qwen3:14b run produced an empty visible `response` while generating 128 tokens. That run is not used as the corrected runtime result because the benchmark harness was subsequently changed to disable thinking and record the separate thinking field.
 
-TASK-003 was then run from the clean benchmark starting state. qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. The required sentence replacement was not present in the resulting diff. Instead, the existing “Calabri” text was corrupted and the final newline was removed. The model then incorrectly reported that only the requested sentence had changed. The working tree was restored to the clean starting state after inspection.
+TASK-003 was then run from the clean benchmark starting state. qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. The required sentence replacement was not present in the resulting diff. Instead, the existing "Calabri" text was corrupted and the final newline was removed. The model then incorrectly reported that only the requested sentence had changed. The working tree was restored to the clean starting state after inspection.
 
 Result: **Failed TASK-003.** The runtime generation result is valid, but the tested coding-agent run did not satisfy the repository write-boundary, preservation, or self-validation requirements. The evidence does not by itself distinguish which portion of the encoding transformation originated in the model versus the tool/runner path; it does establish that the end-to-end coding-agent result was unacceptable for the controlled task.
 
 
-### gpt-oss:20b — TASK-003
+### gpt-oss:20b - TASK-003
 
 TASK-003 was executed against a reconstructed fixture because the original recorded benchmark starting commit `9aee2dbd8c3d8585812b60fe5300b55131369fb4` is no longer reachable from the GitHub or ADO `chatgpt` history. The fixture was derived from the current clean `chatgpt` state by changing only the documented target sentence backward to the TASK-003 precondition. This is not evidence that the historical commit itself was executed.
 
@@ -186,7 +186,7 @@ The reconstructed fixture was verified before the coding run:
 gpt-oss:20b then used the structured `write_file` operation and reported that it had changed only `MODELS.md`. Independent inspection of the resulting diff showed that it did not preserve the file:
 
 - the requested sentence replacement was present;
-- unrelated existing “Calabri” text was corrupted;
+- unrelated existing "Calabri" text was corrupted;
 - the final newline was removed;
 - the model incorrectly reported that the requested change was the only change;
 - `git diff --check` passed despite the semantic corruption and missing final newline.
@@ -197,7 +197,7 @@ The temporary reconstructed worktree was kept separate from the real development
 
 
 
-### qwen3:14b — TASK-003
+### qwen3:14b - TASK-003
 
 TASK-003 was executed against a reconstructed fixture because the original recorded benchmark starting commit `9aee2dbd8c3d8585812b60fe5300b55131369fb4` is no longer reachable from the GitHub or ADO `chatgpt` history. The fixture was derived from the current clean `chatgpt` state by changing only the documented target sentence backward to the TASK-003 precondition. This is not evidence that the historical commit itself was executed.
 
@@ -211,7 +211,7 @@ The reconstructed fixture was verified before the coding run:
 qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. Independent inspection of the resulting diff showed that it did not preserve the file:
 
 - the requested sentence replacement was present;
-- unrelated existing “Calabri” text was corrupted;
+- unrelated existing "Calabri" text was corrupted;
 - the final newline was removed;
 - the model incorrectly reported that only the requested sentence had changed;
 - `git diff --check` passed despite the semantic corruption and missing final newline.
@@ -222,7 +222,7 @@ The temporary reconstructed worktree was separate from the real development chec
 
 
 
-### gpt-oss:20b — Runtime
+### gpt-oss:20b - Runtime
 
 Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchmark harness was configured with `think=false` so that the final response was measured separately from model reasoning output.
 
@@ -249,7 +249,7 @@ The final visible response was correct. Runtime evidence is valid for this run; 
 
 No model is selected as a coding, compliance, testing/review, or planning default as a result of these tasks.
 
-### Harness correction — 2026-09-25
+### Harness correction - 2026-09-25
 
 The TASK-003 runs for qwen3:14b and gpt-oss:20b, as well as the earlier devstral-small-2:latest run, exposed the same class of unrelated Unicode corruption and final-newline loss during complete-file replacement. Because the tested models shared the same coding-agent runner and repository read/write path, the end-to-end results cannot safely attribute that corruption to the models alone.
 
@@ -259,7 +259,7 @@ This harness correction is committed on GitHub `chatgpt` and must be validated w
 
 Until that validation and a clean rerun of the affected TASK-003 runs, the observed model-specific preservation conclusions remain **end-to-end observations under the previous runner**, not isolated evidence about model capability.
 
-## Phase 3 — Independent Review
+## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
 
@@ -306,9 +306,9 @@ The initial candidates have completed the current benchmark procedure under the 
 
 The next candidate set should be resumed only after the corrected runner passes the isolated text-preservation validation. Because qwen3:14b and gpt-oss:20b were tested before that correction, rerun those two candidates first from clean reconstructed fixtures. Do not proceed to qwen3-coder:30b until the affected runs have been repeated under the corrected harness.
 
-1. qwen3:14b — rerun TASK-003
-2. gpt-oss:20b — rerun TASK-003
-3. qwen3-coder:30b — then test if the corrected harness remains clean
+1. qwen3:14b - rerun TASK-003
+2. gpt-oss:20b - rerun TASK-003
+3. qwen3-coder:30b - then test if the corrected harness remains clean
 
 Do not select a role default from the new candidates based on model size, vendor, or reputation. Record runtime behavior first, then run the controlled repository task from the same clean starting state, inspect the resulting diff, and complete independent review.
 

@@ -40,7 +40,7 @@ The RTX 3060 remains the workstation's available graphics processor for display 
 6. Run tests/review agents.
 7. Inspect the final diff.
 8. Commit the approved work to GitHub chatgpt.
-9. Let the established GitHub → ADO automation path handle synchronization and downstream verification.
+9. Let the established GitHub -> ADO automation path handle synchronization and downstream verification.
 
 ## Safety
 

@@ -64,3 +64,7 @@ Escalate instead of guessing when a task changes:
 - branch or release workflow;
 - security boundaries;
 - local-agent permission boundaries.
+
+## ASCII-Only Source-Controlled Text
+
+All source-controlled text files must contain ASCII characters only. Non-ASCII Unicode characters, Unicode punctuation, Unicode symbols, and emojis are prohibited. Agents must use deterministic UTF-8 handling when reading and writing files and must verify that source-controlled text remains ASCII-only before commit.

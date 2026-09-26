@@ -42,7 +42,7 @@ Candidate families and classes to investigate include:
 - efficient models specifically designed for consumer/local hardware;
 - any candidate that demonstrates strong real-world coding-agent performance despite modest active-parameter counts.
 
-A previously recalled model name sounding like “Calabri” has not been positively identified. Do not add an assumed model under that name; investigate the identity if it becomes relevant.
+A previously recalled model name sounding like "Calabri" has not been positively identified. Do not add an assumed model under that name; investigate the identity if it becomes relevant.
 
 The wishlist is an evaluation queue, not a commitment to download every candidate. Candidates should be narrowed after the workstation hardware/resource baseline is established.
 
