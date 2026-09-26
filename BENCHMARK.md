@@ -58,6 +58,12 @@ These candidates are an evaluation set, not a ranking or selection. Pull and ben
 
 The workstation has approximately 27.9 GB visible system RAM and approximately 16.1 GB free at the current idle baseline. The `qwen3-coder:30b` and `gpt-oss:20b` candidates are therefore expected to require meaningful CPU/system-RAM offloading on this workstation; measure actual behavior rather than assuming feasibility from model size.
 
+## Development-Agent Benchmark Objective
+
+The benchmark is now explicitly evaluating the practical local development-agent capability required to continue the existing AI Legal Platform edge-platform work. The target is not maximum raw generation speed. The evaluation must establish repository comprehension, architecture preservation, Python implementation quality, testing/debugging, documentation and project-state accuracy, diff discipline, honest validation, and repeatable continuation from real project state.
+
+The benchmark remains incremental: controlled harness correctness first, then focused repository tasks, then representative Python edge-service work, multi-file/cross-service work, and finally development-agent acceptance with independent review. Legal-AI workload evaluation is a later capability track and is not used to distort the current development-agent benchmark.
+
 ## Phase 2 - Repository Task
 
 Use a clean working copy of the exact edge-ai chatgpt benchmark starting commit.
@@ -294,7 +300,21 @@ Record one result per model:
 | Independent review | findings |
 | Unverified behavior | explicit list |
 
-Do not assign an overall score or ranking. The evidence determines whether a candidate satisfies a documented role requirement.
+Do not assign an overall score or ranking. The evidence determines whether a candidate satisfies a documented role requirement. For the development-agent role, successful continuation of representative real repository work is the acceptance evidence.
+
+## Development-Agent Validation Sequence
+
+The benchmark should progress from low-risk controlled tasks to actual continuation of the edge-platform workflow:
+
+1. Harness correctness and byte-preservation validation.
+2. Minimal repository write-boundary task.
+3. Python single-file implementation task in a real repository.
+4. Python multi-file implementation and test task in an edge service.
+5. Cross-service task where an explicit contract requires coordinated repository changes.
+6. Project/documentation-state continuation task using authoritative status and history.
+7. Independent compliance/testing review and human acceptance.
+
+The existing model-specific results below remain historical evidence from their documented runs. They are not converted into an overall ranking. Model selection remains pending until the required development-agent stages are completed.
 
 ## Execution Order
 

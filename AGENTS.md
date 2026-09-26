@@ -22,6 +22,9 @@ If the task affects an AI Legal Platform repository, the agent must also read th
 - Never expose or commit credentials, tokens, private keys, model caches, personal data, or evidence data.
 - Do not push GitHub `public` directly.
 - Development work belongs on GitHub `chatgpt` unless a task explicitly states otherwise.
+- When continuing existing project work, establish current repository state and read the authoritative project/status documents and relevant history before deciding what to change.
+- Python is a first-class development requirement for the current edge-service workload; validate Python changes with the repository's actual tests and runtime evidence where applicable.
+- Do not silently redefine project scope, architecture, or authoritative project status. Escalate cross-repository or project-state changes when the task does not explicitly authorize them.
 - Do not treat a model's confidence as proof of compliance.
 
 ## Agent Separation

@@ -2,7 +2,7 @@
 
 ## Objective
 
-Select local models for specific agent roles based on observed repository-task performance, not model reputation alone.
+Select local models for specific agent roles based on observed repository-task performance, not model reputation alone. The immediate selection target is a practical development agent capable of continuing the existing AI Legal Platform edge-platform workflow at the required quality level.
 
 ## Initial Roles
 
@@ -17,7 +17,9 @@ Select local models for specific agent roles based on observed repository-task p
 
 Candidate models should be evaluated for:
 - instruction adherence;
-- ability to inspect an existing repository before editing;
+- ability to establish current repository and project state before editing;
+- ability to continue an existing development increment from authoritative documentation and history;
+- Python implementation quality for the current edge-service workload;
 - preservation of established architecture;
 - multi-file consistency;
 - test generation and execution reasoning;
@@ -25,6 +27,11 @@ Candidate models should be evaluated for:
 - resistance to unrelated rewrites;
 - long-context repository comprehension;
 - tool-use reliability;
+- testing and debugging quality;
+- documentation and project-state accuracy;
+- diff/self-validation accuracy;
+- cross-repository consistency when explicitly required;
+- repeatability of successful repository work;
 - latency and resource consumption on the local workstation.
 
 ## Evaluation Wishlist
@@ -67,6 +74,10 @@ The current baseline measurement showed approximately:
 These figures are not hard model-size limits. They establish the starting point for measuring GPU-only inference, GPU/system-RAM offloading, latency, memory pressure, and task quality.
 
 The workstation's Intel Xeon E3-1270 v5 does not provide integrated graphics, so the benchmark plan must not assume that desktop applications can be moved to an integrated GPU to free RTX 3060 VRAM.
+
+## Development-Agent Acceptance
+
+A candidate is evaluated as a development agent only through representative real repository tasks. The evidence must show that it can pick up current project state, implement scoped Python and documentation changes, preserve architecture and unrelated content, run or reason about relevant tests, inspect its diff, distinguish verified from unverified behavior, and avoid silently changing project direction. No candidate is selected as a default until the required evidence and independent review exist.
 
 ## Benchmark Rule
 

@@ -28,6 +28,12 @@ The environment must be reusable across:
 - `edge-audio`;
 - future AI Legal Platform repositories.
 
+## Current Development-Agent Objective
+
+The immediate purpose of this environment is to establish a local development agent that can continue the actual AI Legal Platform edge-platform work from the current repository and project state. The agent must be able to inspect authoritative documentation and source, understand existing architecture and service boundaries, implement scoped changes in Python, test and debug those changes, review its diff, update appropriate project documentation, and report verified versus unverified state accurately.
+
+This is a development capability objective, not a model-size or token-speed competition. A model is useful for the role only when representative real repository tasks demonstrate the required behavior. The same local AI host may later be reused for legal-AI workloads; that later workload is evaluated separately.
+
 ## Cost boundary
 
 The base development environment must require **$0 incremental AI cost**.

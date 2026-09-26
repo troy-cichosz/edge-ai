@@ -6,11 +6,15 @@ roles:
   chatgpt:
     purpose: architecture_requirements_review
   coding:
-    purpose: scoped_implementation
+    purpose: scoped_implementation_and_development_continuation
     requires_issue_scope: true
     requires_repository_instructions: true
+    requires_project_context: true
+    requires_current_repository_state: true
     requires_diff_review: true
     requires_tests: true
+    python_first_class: true
+    cannot_redefine_project_state: true
   compliance:
     purpose: independent_rules_review
     independent_from_coding_agent: true

@@ -10,6 +10,20 @@ roles:
   coding:
     status: benchmark_pending
     candidates: []
+    target: development_agent
+    evaluation:
+      - python_implementation
+      - repository_comprehension
+      - project_state_continuation
+      - instruction_adherence
+      - architecture_preservation
+      - multi_file_consistency
+      - testing_and_debugging
+      - documentation_accuracy
+      - git_diff_discipline
+      - self_validation_accuracy
+      - resource_feasibility
+      - repeatability
   compliance:
     status: benchmark_pending
     candidates: []
@@ -23,6 +37,9 @@ roles:
 policy:
   select_by_benchmark: true
   require_real_repository_task: true
+  require_development_continuation: true
+  require_python_capability: true
+  require_human_acceptance: true
   require_independent_review: true
   preserve_architecture: true
   prohibit_unsolicited_rewrite: true
