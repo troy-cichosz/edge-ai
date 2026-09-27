@@ -405,10 +405,15 @@ After editing:
 - inspect git status;
 - inspect git diff;
 - run git_diff_check;
+- verify every changed file is explicitly authorized and every diff hunk is required by the task;
+- if you introduced unrelated whitespace, formatting, cleanup, refactoring, or other out-of-scope changes, remove those changes before completion;
+- re-read the complete changed file after any cleanup;
+- re-run git status, git diff, and git_diff_check after cleanup;
 - report exact changed files;
 - report validation performed;
 - report anything you could not verify.
 
+The final diff must be minimal and task-scoped. Do not leave unrelated changes in the working tree merely because they are harmless.
 Do not claim a validation result you did not obtain from a tool.
 Do not commit or push.
 "@
