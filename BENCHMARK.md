@@ -299,6 +299,40 @@ The disposable benchmark worktree is not an accepted implementation and must not
 
 Aider is the active coding-agent framework under evaluation. The next controlled run should use a clean disposable worktree and a different substantive task/model combination where practical. Do not repair a failed benchmark result before recording it; repairs would contaminate the evaluation. The qwen3:14b and qwen3-coder:30b candidates remain available for subsequent Aider evaluation.
 
+
+
+### Aider / qwen3:14b - TASK-PY-003
+
+TASK-PY-003 was run through Aider with qwen3:14b from a clean disposable edge-video worktree. The task required the live HLS branch to be disabled after failure while the authoritative evidence branch continued receiving data, with focused pytest coverage for failure and normal-operation behavior.
+
+The model identified the need to track live-branch failure and attempted to implement that behavior. However, the resulting production edit was not acceptable:
+
+- unrelated recording-format text was corrupted: "h264" became "h26线";
+- the inserted non-ASCII character violates the repository ASCII-only source policy;
+- the displayed _read_capture() diff was malformed/incomplete and could not be accepted as a trustworthy implementation.
+
+The generated tests/test_media.py was also not acceptable:
+
+- only one test was visibly created;
+- it manually set pipeline.live_failed = True instead of exercising an actual live process or pipe failure;
+- it therefore did not demonstrate that evidence continues after a real failure;
+- it did not demonstrate that the failed live pipe is not written to again;
+- it did not demonstrate the existing live_error mechanism;
+- it did not provide the requested normal-operation coverage.
+
+Aider's auto-test reported:
+
+    tests/test_media.py
+    1 passed in 0.59s
+
+That result did not validate the requested behavior because the test itself bypassed the failure mechanism. The transcript did not demonstrate the requested final git diff or git diff --check validation. Aider also automatically added .aider* to .gitignore, creating an unrelated working-tree change.
+
+The run ended with Aider summarization failures after the test result. Those summarization errors are secondary; the benchmark failure was already established by the invalid production edit, inadequate tests, ASCII violation, and incomplete validation evidence.
+
+Result: **Failed TASK-PY-003.** This is an end-to-end Aider/qwen3:14b observation from the controlled run and is not treated as a universal claim about either Aider or qwen3:14b.
+
+The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
