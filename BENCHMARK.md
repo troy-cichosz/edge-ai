@@ -265,6 +265,40 @@ This harness correction is committed on GitHub `chatgpt` and must be validated w
 
 Until that validation and a clean rerun of the affected TASK-003 runs, the observed model-specific preservation conclusions remain **end-to-end observations under the previous runner**, not isolated evidence about model capability.
 
+## Coding-Agent Framework Evaluation
+
+### Framework pivot - 2026-09-27
+
+The benchmark moved from the bespoke PowerShell coding-agent runner to an established repository-oriented coding-agent framework before continuing substantive development-agent evaluation. Aider was selected as the first framework to evaluate because it provides Git-aware repository mapping, structured file editing, testing integration, and local Ollama support without requiring a paid hosted coding service.
+
+The bespoke runner remains documented as harness history. Its observed transport and tool-path defects are not being treated as model capability results when the harness itself prevented valid task execution.
+
+The development-agent benchmark now evaluates the end-to-end combination of coding-agent framework plus local model. A successful run requires correct implementation, focused tests, preservation of unrelated content, required validation, scoped changes, ASCII compliance, and accurate reporting. Independent review remains mandatory.
+
+### Aider / gpt-oss:20b - TASK-PY-003
+
+TASK-PY-003 was the first substantive Python edge-service task run through Aider. The task required a live HLS failure to disable the live branch for the remainder of capture while the authoritative evidence branch continued receiving data, with focused pytest coverage and explicit diff/validation checks.
+
+The Aider run produced the intended production change in app/media.py:
+
+- set self.live_enabled = False when the live process is already exited;
+- set self.live_enabled = False when the live pipe raises BrokenPipeError or OSError.
+
+The generated tests/test_media.py was not acceptable. The failure simulation was implemented on DummyProcess.write(), while the production code writes to live.stdin.write() and stdin was an io.BytesIO; therefore the simulated failure was never actually triggered. The tests also attempted to inspect BytesIO after the production shutdown path had closed it. Independent execution produced two failures:
+
+- test_live_failure_disables_live - ValueError: I/O operation on closed file;
+- test_live_normal_operation - ValueError: I/O operation on closed file.
+
+The run also introduced an unrelated .gitignore file and a non-ASCII whitespace character in tests/test_media.py, violating the repository ASCII-only rule. The Aider transcript did not demonstrate completion of the requested pytest, final-diff, and git diff --check validation before the run stopped for interactive input.
+
+Result: **Failed TASK-PY-003.** The production implementation direction was correct, but the end-to-end development-agent result failed test correctness, validation discipline, scope/encoding compliance, and autonomous completion requirements. This is an Aider/gpt-oss:20b end-to-end observation and is not treated as a universal claim about either Aider or gpt-oss:20b.
+
+The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
+
+### Current framework evaluation state
+
+Aider is the active coding-agent framework under evaluation. The next controlled run should use a clean disposable worktree and a different substantive task/model combination where practical. Do not repair a failed benchmark result before recording it; repairs would contaminate the evaluation. The qwen3:14b and qwen3-coder:30b candidates remain available for subsequent Aider evaluation.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
