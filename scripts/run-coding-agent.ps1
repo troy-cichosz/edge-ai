@@ -479,11 +479,17 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         throw
     }
 
-    if ($null -eq $response.message) {
-        throw "Ollama returned no message."
+    if ($null -eq $response) {
+        throw "Ollama returned no response object."
     }
 
-    $assistantMessage = $response.message
+    $messageProperty = $response.PSObject.Properties["message"]
+    if ($null -eq $messageProperty -or $null -eq $messageProperty.Value) {
+        $responseText = $response | ConvertTo-Json -Depth 20 -Compress
+        throw "Ollama returned no message. Response: $responseText"
+    }
+
+    $assistantMessage = $messageProperty.Value
 
     $assistantContent = ""
     $contentProperty = $assistantMessage.PSObject.Properties["content"]
