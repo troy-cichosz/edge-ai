@@ -473,6 +473,41 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         if ($null -ne $_.ErrorDetails -and $null -ne $_.ErrorDetails.Message) {
             $errorMessages += [string]$_.ErrorDetails.Message
         }
+
+        $responseBody = $null
+        $responseStatus = $null
+        if ($null -ne $_.Exception -and $null -ne $_.Exception.Response) {
+            try {
+                $responseStatus = [int]$_.Exception.Response.StatusCode
+            }
+            catch {
+                $responseStatus = $null
+            }
+
+            try {
+                $stream = $_.Exception.Response.GetResponseStream()
+                if ($null -ne $stream) {
+                    $reader = [System.IO.StreamReader]::new($stream)
+                    try {
+                        $responseBody = $reader.ReadToEnd()
+                    }
+                    finally {
+                        $reader.Dispose()
+                    }
+                }
+            }
+            catch {
+                $responseBody = $null
+            }
+        }
+
+        if ($null -ne $responseStatus) {
+            $errorMessages += "HTTP status: $responseStatus"
+        }
+        if (-not [string]::IsNullOrWhiteSpace($responseBody)) {
+            $errorMessages += "Response body: $responseBody"
+        }
+
         $errorText = $errorMessages -join " "
 
         if ($errorText -match "does not support tools") {
@@ -480,7 +515,7 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
             Invoke-TextModeAgent
             break
         }
-        throw
+        throw $errorText
     }
 
     if ($null -eq $response) {
