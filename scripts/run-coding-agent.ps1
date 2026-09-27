@@ -181,6 +181,57 @@ function Invoke-RepoTool {
             return "Wrote $relative"
         }
 
+        "append_file" {
+            $relative = Assert-WriteAllowed ([string]$Arguments.path)
+            $full = Join-Path $repoRoot $relative
+            $parent = Split-Path -Parent $full
+
+            if (-not (Test-Path -LiteralPath $parent -PathType Container)) {
+                New-Item -ItemType Directory -Path $parent -Force | Out-Null
+            }
+
+            $content = [string]$Arguments.content
+            if (Test-Path -LiteralPath $full -PathType Leaf) {
+                $existing = Read-Utf8File $full
+                $content = $existing + $content
+            }
+
+            [System.IO.File]::WriteAllText(
+                $full,
+                $content,
+                [System.Text.UTF8Encoding]::new($false)
+            )
+
+            return "Appended to $relative"
+        }
+
+        "edit_file" {
+            $relative = Assert-WriteAllowed ([string]$Arguments.path)
+            $full = Join-Path $repoRoot $relative
+
+            if (-not (Test-Path -LiteralPath $full -PathType Leaf)) {
+                throw "File not found: $relative"
+            }
+
+            $content = Read-Utf8File $full
+            $oldText = [string]$Arguments.old_text
+            $newText = [string]$Arguments.new_text
+            $count = ([regex]::Matches($content, [regex]::Escape($oldText))).Count
+
+            if ($count -ne 1) {
+                throw "edit_file requires exactly one occurrence of old_text in '$relative'; found $count."
+            }
+
+            $updated = $content.Replace($oldText, $newText)
+            [System.IO.File]::WriteAllText(
+                $full,
+                $updated,
+                [System.Text.UTF8Encoding]::new($false)
+            )
+
+            return "Edited $relative"
+        }
+
         default {
             throw "Unknown tool: $Name"
         }
@@ -234,6 +285,52 @@ $tools = @(
                     }
                 }
                 required = @("path", "content")
+            }
+        }
+    },
+    @{
+        type = "function"
+        function = @{
+            name = "append_file"
+            description = "Append a bounded UTF-8 text chunk to an authorized repository file. Use this for new or large files instead of sending a large complete file in one tool call. Writes are restricted to the explicit AllowedWritePaths supplied by the human."
+            parameters = @{
+                type = "object"
+                properties = @{
+                    path = @{
+                        type = "string"
+                        description = "Repository-relative file path. Must be authorized for this run."
+                    }
+                    content = @{
+                        type = "string"
+                        description = "A bounded text chunk to append. For large files, use multiple append_file calls."
+                    }
+                }
+                required = @("path", "content")
+            }
+        }
+    },
+    @{
+        type = "function"
+        function = @{
+            name = "edit_file"
+            description = "Replace exactly one occurrence of old_text with new_text in an authorized UTF-8 text file. Use this for targeted edits to avoid rewriting an entire file."
+            parameters = @{
+                type = "object"
+                properties = @{
+                    path = @{
+                        type = "string"
+                        description = "Repository-relative file path. Must be authorized for this run."
+                    }
+                    old_text = @{
+                        type = "string"
+                        description = "Exact existing text to replace. It must occur exactly once."
+                    }
+                    new_text = @{
+                        type = "string"
+                        description = "Replacement text."
+                    }
+                }
+                required = @("path", "old_text", "new_text")
             }
         }
     },
@@ -390,7 +487,7 @@ You are the coding agent for a controlled local repository task.
 Repository root: $repoRoot
 Model under test: $Model
 
-You have access only to these repository-scoped tools supplied by this runner: list_files, read_file, write_file, git_status, git_diff, git_diff_check, and run_pytest.
+You have access only to these repository-scoped tools supplied by this runner: list_files, read_file, write_file, append_file, edit_file, git_status, git_diff, git_diff_check, and run_pytest.
 Do not call search or any other tool name. If a needed operation is not provided, report that limitation rather than inventing a tool.
 You cannot commit, push, access .git, or access files outside the repository.
 Write access is limited to these explicitly authorized paths:
@@ -398,7 +495,7 @@ $($allowedWrites.Keys -join ", ")
 
 You must follow the task exactly. Do not make improvements, refactors, cleanup, or unrelated documentation changes.
 
-Before editing, inspect the repository context required by the task. Use read_file for complete files, not partial guesses.
+Before editing, inspect the repository context required by the task. Use read_file for complete files, not partial guesses. Prefer edit_file for targeted changes. For new or large files, prefer append_file with multiple bounded chunks rather than one large write_file call.
 
 After editing:
 - read the complete changed file;
