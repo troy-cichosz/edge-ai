@@ -466,10 +466,14 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
             -Body $payloadBytes
     }
     catch {
-        $errorText = @(
-            $_.Exception.Message
-            $_.ErrorDetails.Message
-        ) -join " "
+        $errorMessages = @()
+        if ($null -ne $_.Exception -and $null -ne $_.Exception.Message) {
+            $errorMessages += [string]$_.Exception.Message
+        }
+        if ($null -ne $_.ErrorDetails -and $null -ne $_.ErrorDetails.Message) {
+            $errorMessages += [string]$_.ErrorDetails.Message
+        }
+        $errorText = $errorMessages -join " "
 
         if ($errorText -match "does not support tools") {
             Write-Host "Model does not support native tool calling; switching to controlled text mode." -ForegroundColor Yellow
