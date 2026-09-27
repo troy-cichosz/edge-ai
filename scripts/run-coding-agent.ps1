@@ -446,6 +446,7 @@ for ($turn = 1; $turn -le $MaxTurns; $turn++) {
         tools = $tools
         options = @{
             temperature = 0
+            num_ctx = 8192
         }
     } | ConvertTo-Json -Depth 30 -Compress
 
