@@ -140,6 +140,29 @@ function Invoke-RepoTool {
             return "git diff --check passed."
         }
 
+        "run_pytest" {
+            $paths = @($Arguments.paths)
+            if ($paths.Count -eq 0) {
+                throw "At least one pytest path is required."
+            }
+
+            $safePaths = @()
+            foreach ($path in $paths) {
+                $relative = Get-SafeRelativePath ([string]$path)
+                $full = Join-Path $repoRoot $relative
+                if (-not (Test-Path -LiteralPath $full)) {
+                    throw "Pytest path not found: $relative"
+                }
+                $safePaths += $relative
+            }
+
+            $output = & python -m pytest @safePaths 2>&1
+            $exitCode = $LASTEXITCODE
+            $details = if ($output) { $output -join [Environment]::NewLine } else { "(no pytest output)" }
+
+            return ("pytest_exit_code=$exitCode" + [Environment]::NewLine + $details)
+        }
+
         "write_file" {
             $relative = Assert-WriteAllowed ([string]$Arguments.path)
             $full = Join-Path $repoRoot $relative
@@ -246,6 +269,26 @@ $tools = @(
                 properties = @{}
             }
         }
+    },
+    @{
+        type = "function"
+        function = @{
+            name = "run_pytest"
+            description = "Run pytest against specified repository-relative test paths using the repository Python environment. This does not modify source files."
+            parameters = @{
+                type = "object"
+                properties = @{
+                    paths = @{
+                        type = "array"
+                        description = "Repository-relative pytest paths. Do not provide shell commands or options."
+                        items = @{
+                            type = "string"
+                        }
+                    }
+                }
+                required = @("paths")
+            }
+        }
     }
 )
 
@@ -347,7 +390,8 @@ You are the coding agent for a controlled local repository task.
 Repository root: $repoRoot
 Model under test: $Model
 
-You have access only to repository-scoped tools supplied by this runner.
+You have access only to these repository-scoped tools supplied by this runner: list_files, read_file, write_file, git_status, git_diff, git_diff_check, and run_pytest.
+Do not call search or any other tool name. If a needed operation is not provided, report that limitation rather than inventing a tool.
 You cannot commit, push, access .git, or access files outside the repository.
 Write access is limited to these explicitly authorized paths:
 $($allowedWrites.Keys -join ", ")
