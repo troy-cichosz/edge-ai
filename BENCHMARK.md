@@ -355,6 +355,32 @@ Result: **Failed TASK-PY-004.** The run did not satisfy the required end-to-end 
 
 The disposable benchmark worktree was subsequently reset to `b1554cffb13b76cc6944c4cd92609e54b405adca` and cleaned. No benchmark implementation or generated artifacts were promoted to `chatgpt` or `public`.
 
+### Aider / qwen3:14b - TASK-PY-003 - Edit-Format Failure
+
+A second Aider/qwen3:14b TASK-PY-003 run was started from clean disposable edge-video baseline commit b1554cffb13b76cc6944c4cd92609e54b405adca. The task was the same live-stream failure-handling and focused production-path pytest task described above.
+
+The model produced intermediate output in which four requested tests were reported as passing:
+
+- test_live_process_exits_during_capture
+- test_broken_pipe_during_live_write
+- test_os_error_during_live_write
+- test_normal_operation_both_branches_receive_data
+
+However, Aider then reported an edit-format failure: "The LLM did not conform to the edit format" and "No filename provided before ``` in file listing". The model attempted to regenerate the complete app/media.py edit and became stuck while producing the file. The run was interrupted.
+
+Independent inspection after interruption established:
+
+- app/media.py was unchanged from the clean baseline;
+- tests/test_media.py existed only as an untracked artifact and did not contain runnable tests;
+- Aider artifacts and the task file were untracked;
+- independent python -m pytest tests/test_media.py -q reported "no tests ran";
+- there was no tracked implementation diff to inspect;
+- the worktree was then reset to b1554cffb13b76cc6944c4cd92609e54b405adca and cleaned.
+
+Result: **Failed TASK-PY-003.** The intermediate passing-test output cannot be accepted as a repository-task result because Aider failed to materialize the implementation and tests into the worktree. This is recorded as an end-to-end Aider/qwen3:14b edit-format/materialization failure, not as evidence that the underlying code solution was incorrect.
+
+No benchmark implementation or generated artifact was promoted to chatgpt or public.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
