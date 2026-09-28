@@ -59,7 +59,9 @@ The workstation currently has:
 - Ollama 0.34.4;
 - gemma3:4b;
 - llama3.1:8b;
-- devstral-small-2:latest.
+- devstral-small-2:latest;
+- qwen3:14b;
+- gpt-oss:20b.
 
 These are the currently verified local models and are not yet selected defaults for any agent role.
 
