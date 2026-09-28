@@ -217,7 +217,7 @@ The reconstructed fixture was verified before the coding run:
 qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. Independent inspection of the resulting diff showed that it did not preserve the file:
 
 - the requested sentence replacement was present;
-- unrelated existing "Calabri" text was corrupted;- the final newline was removed;
+- unrelated existing "Calabri" text was corrupted; the final newline was removed;
 - the model incorrectly reported that only the requested sentence had changed;
 - `git diff --check` passed despite the semantic corruption and missing final newline.
 
