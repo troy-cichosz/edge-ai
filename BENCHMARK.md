@@ -217,8 +217,7 @@ The reconstructed fixture was verified before the coding run:
 qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. Independent inspection of the resulting diff showed that it did not preserve the file:
 
 - the requested sentence replacement was present;
-- unrelated existing "Calabri" text was corrupted;
-- the final newline was removed;
+- unrelated existing "Calabri" text was corrupted;- the final newline was removed;
 - the model incorrectly reported that only the requested sentence had changed;
 - `git diff --check` passed despite the semantic corruption and missing final newline.
 
@@ -380,6 +379,27 @@ Independent inspection after interruption established:
 Result: **Failed TASK-PY-003.** The intermediate passing-test output cannot be accepted as a repository-task result because Aider failed to materialize the implementation and tests into the worktree. This is recorded as an end-to-end Aider/qwen3:14b edit-format/materialization failure, not as evidence that the underlying code solution was incorrect.
 
 No benchmark implementation or generated artifact was promoted to chatgpt or public.
+
+
+### Aider / gpt-oss:20b - TASK-PY-004
+
+TASK-PY-004 was run through Aider with gpt-oss:20b from clean disposable edge-video baseline commit b1554cffb13b76cc6944c4cd92609e54b405adca. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production paths and preserving the authoritative evidence branch.
+
+Independent inspection of the resulting worktree established:
+
+- app/media.py contained only the three intended production changes: disable self.live_enabled after live startup failure, after a detected live-process exit, and after BrokenPipeError/OSError during live writes.
+- The production implementation remained otherwise unchanged; the evidence-first capture path, recording format, manifest schema, temporal behavior, hashing behavior, and process ownership were preserved.
+- tests/test_media.py contained four tests and independent pytest execution reported 4 passed.
+- The tests did not fully satisfy the requested coverage. There was no separate OSError test, and the failure tests did not assert that evidence received subsequent capture chunks after live failure or that the failed live pipe received no later writes.
+- Pytest emitted one PytestCollectionWarning because the helper dataclass was named TestConfig.
+- git diff --check passed.
+- ASCII validation passed for the tracked production diff.
+- The only tracked source diff was app/media.py; tests/test_media.py was an untracked benchmark artifact and therefore was not part of the tracked diff.
+- Aider did not demonstrate the required final complete-file inspection, final diff review, ASCII check, changed-file verification, or exact final report. Its final summarization also failed.
+
+Result: **Failed TASK-PY-004.** The production implementation was correct and minimally scoped, but the end-to-end development-agent result did not satisfy the complete task because the generated test coverage was incomplete and the required final validation/reporting was not demonstrated. The independent 4-passing-test result is retained as evidence, but it is not treated as sufficient acceptance evidence.
+
+This is an end-to-end Aider/gpt-oss:20b observation and is not treated as a universal claim about either Aider or gpt-oss:20b. The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
 
 ## Phase 3 - Independent Review
 
