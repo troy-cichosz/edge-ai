@@ -401,6 +401,15 @@ Result: **Failed TASK-PY-004.** The production implementation was correct and mi
 
 This is an end-to-end Aider/gpt-oss:20b observation and is not treated as a universal claim about either Aider or gpt-oss:20b. The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
 
+
+### Aider / qwen3:14b - TASK-PY-004
+
+TASK-PY-004 was run through Aider with qwen3:14b from clean disposable edge-video baseline commit b1554cffb13b76cc6944c4cd92609e54b405adca. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production _read_capture() paths and preserving the authoritative evidence branch.
+
+Independent inspection established that Aider modified app/media.py and created tests/test_media.py. The production edit introduced live_active handling for startup failure, live-process exit, and BrokenPipeError/OSError, but also corrupted the recording format string from "h264" to "h26线", violating recording-format preservation and the ASCII-only source policy. The generated five-test suite failed all five tests under independent pytest execution. The tests did not validly prove evidence continuation after live failure, suppression of later writes to the failed live pipe, or normal-operation delivery to both branches. The complete Aider transcript was not retained, so no claims are made about its internal reasoning or the cause of the prolonged run. Independent GPU verification confirmed qwen3:14b was using the RTX 3060 at 24% CPU / 76% GPU, so GPU selection was not the cause of the failure. git diff --check passed for the resulting tracked production diff. The disposable worktree was reset and cleaned to the exact baseline, and no benchmark implementation or generated artifacts were promoted to chatgpt or public.
+
+Result: **Failed TASK-PY-004.** The end-to-end development-agent result did not satisfy the implementation, recording-format preservation, focused test coverage, or validation requirements. This is an end-to-end Aider/qwen3:14b observation and is not treated as a universal claim about either Aider or qwen3:14b.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
