@@ -4,6 +4,14 @@
 
 Select local models for specific agent roles based on observed repository-task performance, not model reputation alone. The immediate selection target is a practical development agent capable of continuing the existing AI Legal Platform edge-platform workflow at the required quality level.
 
+## Selection Approach
+
+Model selection is subordinate to coding-agent framework selection. Models should be evaluated as part of an end-to-end agent configuration that includes repository context, tool execution, permissions, Git behavior, validation, and deterministic workflow controls.
+
+The project should prefer an established free/open-source repository-oriented coding-agent framework before extending bespoke agent infrastructure. Deterministic branch, repository, permission, and release controls must surround the model so that hard project boundaries do not depend solely on model instruction adherence.
+
+No model becomes a role default until representative repository evidence and independent review demonstrate that the complete configured workflow satisfies the documented role requirements.
+
 ## Initial Roles
 
 | Role | Primary requirement | Status |

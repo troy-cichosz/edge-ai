@@ -264,6 +264,39 @@ This harness correction is committed on GitHub `chatgpt` and must be validated w
 
 Until that validation and a clean rerun of the affected TASK-003 runs, the observed model-specific preservation conclusions remain **end-to-end observations under the previous runner**, not isolated evidence about model capability.
 
+## Current Direction
+
+The benchmark now qualifies a practical local development-agent configuration rather than indefinitely ranking individual models. The preferred path is to use an established free/open-source repository-oriented coding-agent framework that works with the existing Windows, Git, Ollama, and repository workflow.
+
+Model behavior remains important, but model selection is evaluated within a framework configuration. Deterministic repository, branch, permission, and release controls must enforce hard boundaries instead of relying on model instruction-following alone. Independent testing/compliance review and human acceptance remain separate acceptance controls.
+
+The existing bespoke runner and its historical results remain useful evidence about harness behavior and earlier model/framework runs. They do not require continued expansion of bespoke infrastructure when an established framework provides the required capabilities.
+
+## Coding-Agent Framework Discovery
+
+Before extending the custom runner or committing to a single framework, evaluate established local/repository-oriented candidates that fit the project constraints. The initial discovery set is:
+
+- Aider
+- Cline
+- Roo Code
+- Continue
+- OpenHands
+
+The discovery criteria are:
+
+- free/open-source operation without a paid hosted coding-agent requirement;
+- Windows support;
+- local Ollama/model support;
+- Git-aware repository operation;
+- repository instructions/context handling;
+- tool execution and file-edit reliability;
+- test execution and validation support;
+- controllable permissions and working boundaries;
+- compatibility with the chatgpt development branch and no-direct-public rule;
+- practical operation on the current RTX 3060 12 GB / approximately 28 GB RAM workstation.
+
+Aider remains the first established framework under active evaluation. Its normal workflow can create commits automatically, so Aider qualification must explicitly configure --no-auto-commits when the task requires the agent not to commit. This is a framework configuration boundary and must not be treated as a model instruction-following test.
+
 ## Coding-Agent Framework Evaluation
 
 ### Framework pivot - 2026-09-27
@@ -463,19 +496,18 @@ The existing model-specific results below remain historical evidence from their 
 
 ## Execution Order
 
-The initial candidates have completed the current benchmark procedure under the earlier harness:
+The current evaluation order is framework-first rather than an indefinite model-by-model sequence:
 
-1. gemma3:4b
-2. llama3.1:8b
-3. devstral-small-2:latest
+1. Survey established free/local repository-oriented coding-agent frameworks against the project constraints.
+2. Qualify a small common repository task across the shortlisted frameworks from clean disposable worktrees.
+3. Select the practical framework configuration based on end-to-end behavior, control boundaries, repository handling, and validation support.
+4. Evaluate one or more local Ollama models within the selected framework, using the existing benchmark evidence where it remains applicable.
+5. Establish deterministic branch/repository/permission/release controls around the selected agent configuration.
+6. Add independent rules/compliance and testing/review checks.
+7. Validate the resulting workflow against a low-risk real edge-repository task.
+8. Human acceptance is required before the workflow is treated as operational.
 
-The next candidate set should be resumed only after the corrected runner passes the isolated text-preservation validation. Because qwen3:14b and gpt-oss:20b were tested before that correction, rerun those two candidates first from clean reconstructed fixtures. Do not proceed to qwen3-coder:30b until the affected runs have been repeated under the corrected harness.
-
-1. qwen3:14b - rerun TASK-003
-2. gpt-oss:20b - rerun TASK-003
-3. qwen3-coder:30b - then test if the corrected harness remains clean
-
-Do not select a role default from the new candidates based on model size, vendor, or reputation. Record runtime behavior first, then run the controlled repository task from the same clean starting state, inspect the resulting diff, and complete independent review.
+Historical model-specific benchmark results remain retained above as evidence. They are not converted into an overall ranking and do not by themselves determine the framework.
 
 ## Runtime Measurement Command
 
