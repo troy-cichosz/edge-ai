@@ -333,6 +333,28 @@ Result: **Failed TASK-PY-003.** This is an end-to-end Aider/qwen3:14b observatio
 
 The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
 
+### Aider / devstral-small-2:latest - TASK-PY-004
+
+TASK-PY-004 was run through Aider against a clean disposable edge-video worktree at baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production paths and preserving the authoritative evidence branch.
+
+The run progressed into implementation and automated testing:
+
+- Aider modified `app/media.py` and created `tests/test_media.py`.
+- The production implementation attempted to track live failure with `live_failed` and suppress subsequent live writes after live startup/process/pipe failure.
+- The generated tests attempted to cover all four requested scenarios.
+- Independent execution of the resulting tests produced **2 failed, 2 passed**.
+- The startup-failure test assigned the simulated exception to the wrong `subprocess.Popen` invocation, so it failed during capture-process startup rather than exercising the live startup-failure path.
+- The process-exit test exhausted its mocked capture stream and raised `StopIteration` before correctly validating the requested live-process exit behavior.
+- The normal-operation and BrokenPipe tests passed in the resulting test file.
+- The production diff introduced an unrelated change from `stdin=subprocess.DEVNULL` to `stdin=subprocess.PIPE` for the capture process.
+- The production diff also removed unrelated blank-line formatting.
+- ASCII checks of both changed source files passed.
+- The agent did not complete the repair and final validation cycle before the run was stopped.
+
+Result: **Failed TASK-PY-004.** The run did not satisfy the required end-to-end implementation, focused test coverage, scope discipline, and validation requirements. The result is an observation of this Aider/devstral-small-2:latest run and is not treated as a universal claim about either Aider or the model.
+
+The disposable benchmark worktree was subsequently reset to `b1554cffb13b76cc6944c4cd92609e54b405adca` and cleaned. No benchmark implementation or generated artifacts were promoted to `chatgpt` or `public`.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
