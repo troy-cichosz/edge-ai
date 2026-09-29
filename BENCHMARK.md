@@ -281,6 +281,7 @@ Before extending the custom runner or committing to a single framework, evaluate
 - Roo Code
 - Continue
 - OpenHands
+- OpenCode
 
 The discovery criteria are:
 
@@ -442,6 +443,27 @@ TASK-PY-004 was run through Aider with qwen3:14b from clean disposable edge-vide
 Independent inspection established that Aider modified app/media.py and created tests/test_media.py. The production edit introduced live_active handling for startup failure, live-process exit, and BrokenPipeError/OSError, but also corrupted the recording format string from "h264" to "h26线", violating recording-format preservation and the ASCII-only source policy. The generated five-test suite failed all five tests under independent pytest execution. The tests did not validly prove evidence continuation after live failure, suppression of later writes to the failed live pipe, or normal-operation delivery to both branches. The complete Aider transcript was not retained, so no claims are made about its internal reasoning or the cause of the prolonged run. Independent GPU verification confirmed qwen3:14b was using the RTX 3060 at 24% CPU / 76% GPU, so GPU selection was not the cause of the failure. git diff --check passed for the resulting tracked production diff. The disposable worktree was reset and cleaned to the exact baseline, and no benchmark implementation or generated artifacts were promoted to chatgpt or public.
 
 Result: **Failed TASK-PY-004.** The end-to-end development-agent result did not satisfy the implementation, recording-format preservation, focused test coverage, or validation requirements. This is an end-to-end Aider/qwen3:14b observation and is not treated as a universal claim about either Aider or qwen3:14b.
+
+### OpenCode / gpt-oss:20b - TASK-AIDER-001
+
+TASK-AIDER-001 was run through OpenCode with local Ollama `gpt-oss:20b` from clean disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The common qualification required repository inspection before editing, exactly one narrowly scoped production change, exactly one focused test, no unrelated changes, no Git commit, ASCII-only source, and explicit validation.
+
+OpenCode inspected the relevant edge-video implementation and tests before editing, then made one narrowly scoped production change in `app/camera.py`: `Camera.list_cameras()` now converts a `FileNotFoundError` from the configured camera executable into a `RuntimeError` with an informative message. It created one focused test in `tests/test_camera_file_not_found.py` that simulates the missing executable and verifies the resulting error.
+
+Independent validation established:
+
+- full pytest suite: 4 passed;
+- HEAD remained at `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- no Git commit was created by the agent;
+- the tracked production diff contained only `app/camera.py`;
+- the new test was independently inspected and was appropriately scoped;
+- ASCII validation passed for the changed source;
+- pytest-generated `__pycache__` directories were untracked generated artifacts, not source changes;
+- `TASK-AIDER-001.md` was the qualification task input and was not an agent implementation change.
+
+The disposable worktree was not promoted to `chatgpt` or `public`.
+
+Result: **Passed TASK-AIDER-001.** OpenCode + `gpt-oss:20b` is the first tested framework/model configuration to satisfy the complete common qualification requirements. This is an end-to-end observation of the tested configuration and does not establish a universal claim about OpenCode or `gpt-oss:20b`.
 
 ## Phase 3 - Independent Review
 
