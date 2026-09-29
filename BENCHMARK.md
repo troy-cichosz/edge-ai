@@ -539,6 +539,30 @@ Result: **Failed TASK-PY-003.** The coding agent inspected the relevant implemen
 This is an end-to-end OpenCode/`gpt-oss:20b` observation from the controlled run and is not treated as a universal claim about OpenCode or `gpt-oss:20b`. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
 
 
+### OpenCode / gpt-oss:20b - TASK-PY-003 - Corrected Qualification Run
+
+TASK-PY-003 was run through OpenCode with local Ollama `gpt-oss:20b` from disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. This run used the corrected task definition requiring live HLS failure handling, focused production-path tests, preservation of the authoritative evidence branch, no unrelated changes, no Git commit, ASCII-only source, and complete validation.
+
+OpenCode inspected `app/media.py` and the existing tests before editing. It then made a two-line production edit in `app/media.py`:
+
+- set `self.live_process = None` after detected live-process exit;
+- set `self.live_process = None` after `BrokenPipeError` or `OSError` during live writes.
+
+No focused test file was created or modified. The edit therefore did not demonstrate the required behavior that the failed live branch is disabled while the authoritative evidence branch continues receiving subsequent capture data. It also did not exercise the required live-process exit, BrokenPipeError, OSError, and normal-operation scenarios through focused tests.
+
+Independent validation established:
+
+- `git status --short` showed `app/media.py` modified and the task input `TASK-PY-003.md` untracked;
+- HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- `git diff --stat` showed only `app/media.py`, with 2 insertions and 0 deletions;
+- `git diff --check` passed;
+- the existing full test suite reported 3 passed;
+- no Git commit was created;
+- no unrelated tracked file was modified;
+- the required focused tests and final validation/report were not completed.
+
+Result: **Failed TASK-PY-003.** The production edit was insufficient to demonstrate the required live HLS failure behavior, and the required focused tests were not produced. This is an end-to-end OpenCode/`gpt-oss:20b` observation from the controlled run and is not treated as a universal claim about either OpenCode or `gpt-oss:20b`. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
