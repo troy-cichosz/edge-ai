@@ -264,6 +264,24 @@ This harness correction is committed on GitHub `chatgpt` and must be validated w
 
 Until that validation and a clean rerun of the affected TASK-003 runs, the observed model-specific preservation conclusions remain **end-to-end observations under the previous runner**, not isolated evidence about model capability.
 
+### Corrected TASK-003 - OpenCode Controlled Model Comparison
+
+After the harness UTF-8 preservation correction, TASK-003 was rerun with OpenCode using the same verified disposable fixture commit `bafa0d19622cf259f10be6e5eb60e59a12fbe352` for each model. The fixture contained the exact documented TASK-003 precondition before every run. The corrected harness was independently validated for UTF-8 byte preservation, no BOM introduction, and final-newline preservation before these model runs.
+
+The controlled results were:
+
+| OpenCode model | Result | Independent qualification evidence |
+|---|---|---|
+| `gpt-oss:20b` | **Passed** | Inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. |
+| `qwen3:14b` | **Passed** | Same exact `bafa0d1` fixture; inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. |
+| `devstral-small-2:latest` | **Failed** | Made the requested replacement correctly, but then created unauthorized `verification_summary.txt` despite the explicit requirement that only `MODELS.md` may be modified. Independent `git status` confirmed the additional untracked file. |
+
+For all three runs, `TASK-003.md` was the task input supplied before execution and is not counted as an agent repository modification. The `verification_summary.txt` created during the Devstral run is counted as an agent modification because the agent explicitly created it during task execution.
+
+The two passing runs demonstrate that OpenCode with the tested `gpt-oss:20b` and `qwen3:14b` configurations can satisfy this minimal repository write-boundary task under the corrected harness. The Devstral failure demonstrates a repository write-boundary violation despite a correct requested edit. These are end-to-end observations of the tested configurations, not universal claims about the models.
+
+No qualification worktree implementation was promoted to the real `chatgpt` branch or to `public`. These TASK-003 results do not by themselves establish a final framework or model selection; subsequent substantive development-agent tasks remain required.
+
 ### TASK-PY-005 - Evidence Envelope Maintenance
 
 OpenCode + `gpt-oss:20b` was tested against a clean disposable `edge-video` worktree at baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`.
