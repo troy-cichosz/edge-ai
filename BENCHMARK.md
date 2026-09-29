@@ -308,6 +308,21 @@ The OpenCode completion report was also inaccurate about the repository state: i
 
 Result: **Failed TASK-PY-005.** This is an end-to-end qualification observation for the tested OpenCode + `gpt-oss:20b` configuration. It does not establish a universal claim about OpenCode or the model.
 
+
+### Aider / gpt-oss:20b - TASK-PY-004 - Scope and Implementation Failure
+
+TASK-PY-004 was run through Aider with gpt-oss:20b from clean disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production capture paths and preserving the authoritative evidence branch. It also required one narrowly scoped production change, focused tests, complete independent validation, ASCII-only source, and no Git commit.
+
+The Aider run did not satisfy the required repository inspection and scope constraints. The resulting `app/media.py` was substantially rewritten rather than narrowly modified. The independent diff showed unrelated changes including new type annotations and imports, a new `_live_failed` state, replacement of the existing `start()` and capture-reader structure, a rewritten `evidence_command()`, a rewritten `live_command()`, changed FFmpeg options, changed process stdio configuration, changed capture chunk size, altered evidence error handling, altered shutdown behavior, removal of existing process-status helpers, and an incorrect assignment of `self.started_monotonic_ns = self._stop.time()`. These changes were outside the requested live-failure maintenance behavior and changed existing production behavior that the task explicitly required to preserve.
+
+The generated `tests/test_media_pipeline.py` was also not acceptable. It created a new test file instead of using the existing focused media test path, and its failure simulation did not exercise the actual production live-write path: production writes to `live_process.stdin.write()`, while the fake failure was implemented on an unused `FakeProcess.write()` method and the fake stdin was an `io.BytesIO`. The startup-failure test did not actually make the live `Popen()` call fail. The process-exit test forced every fake process to report exited. The OSError test passed an exception object where the helper expected a write-count condition. The tests primarily asserted the internal `_live_failed` flag instead of proving that subsequent capture data reached the authoritative evidence branch and that the failed live branch received no later writes. Required end-to-end behavior was therefore not demonstrated.
+
+Aider also accepted its recommendation to add `.aider*` to `.gitignore`, producing an additional untracked artifact outside the task scope. The agent stopped after applying the edits and did not complete the required focused tests, full test suite, git status/diff review, `git diff --check`, ASCII validation, recording-format validation, evidence-continuation validation, failed-live-write validation, or completion report.
+
+Independent inspection of the resulting diff showed that the existing recording-format value `"h264"` was still present, but preservation of that one value does not offset the extensive unrelated production changes and inadequate tests. No benchmark implementation was accepted or promoted.
+
+Result: **Failed TASK-PY-004.** This is an end-to-end Aider/gpt-oss:20b observation from the controlled run and is not treated as a universal claim about either Aider or gpt-oss:20b. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
+
 ## Current Direction
 
 The benchmark now qualifies a practical local development-agent configuration rather than indefinitely ranking individual models. The preferred path is to use an established free/open-source repository-oriented coding-agent framework that works with the existing Windows, Git, Ollama, and repository workflow.
