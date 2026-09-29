@@ -264,6 +264,32 @@ This harness correction is committed on GitHub `chatgpt` and must be validated w
 
 Until that validation and a clean rerun of the affected TASK-003 runs, the observed model-specific preservation conclusions remain **end-to-end observations under the previous runner**, not isolated evidence about model capability.
 
+### TASK-PY-005 - Evidence Envelope Maintenance
+
+OpenCode + `gpt-oss:20b` was tested against a clean disposable `edge-video` worktree at baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`.
+
+The required production change was made correctly in `app/evidence.py`:
+
+- `capture["end"]` was changed from `None` to `capture["end_utc"]`.
+
+The agent added `tests/test_evidence_envelope.py` covering capture start, capture end, monotonic start, the authoritative video artifact fields, and time context.
+
+Independent validation found:
+
+- focused test: 1 passed;
+- full test suite: 4 passed;
+- HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- no Git commit was created by the agent;
+- the qualification branch remained `opencode-py005`;
+- no unrelated production files were changed;
+- the inspected production and test source remained ASCII-only.
+
+The qualification nevertheless **failed** because the time-context assertion compared the envelope value with the manifest value when both were `None`. It did not construct a manifest containing an actual temporal context and therefore did not demonstrate that a real time context was preserved.
+
+The OpenCode completion report was also inaccurate about the repository state: it reported branch `main` and a clean working tree, while independent inspection showed the expected `opencode-py005` branch and the intended uncommitted production/test changes. The implementation itself remained correct and no commit was created.
+
+Result: **Failed TASK-PY-005.** This is an end-to-end qualification observation for the tested OpenCode + `gpt-oss:20b` configuration. It does not establish a universal claim about OpenCode or the model.
+
 ## Current Direction
 
 The benchmark now qualifies a practical local development-agent configuration rather than indefinitely ranking individual models. The preferred path is to use an established free/open-source repository-oriented coding-agent framework that works with the existing Windows, Git, Ollama, and repository workflow.
