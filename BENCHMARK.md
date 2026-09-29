@@ -509,6 +509,36 @@ The disposable worktree was not promoted to `chatgpt` or `public`.
 
 Result: **Passed TASK-AIDER-001.** OpenCode + `gpt-oss:20b` is the first tested framework/model configuration to satisfy the complete common qualification requirements. This is an end-to-end observation of the tested configuration and does not establish a universal claim about OpenCode or `gpt-oss:20b`.
 
+
+### OpenCode / gpt-oss:20b - TASK-PY-003
+
+TASK-PY-003 was run through OpenCode with local Ollama `gpt-oss:20b` from clean disposable `edge-video` baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required live HLS failure handling so that a failed live branch is disabled for the remainder of capture while the authoritative evidence branch continues receiving capture data. It also required focused tests for live-process exit, `BrokenPipeError`, `OSError`, and normal operation, plus complete validation and accurate reporting.
+
+OpenCode inspected `app/media.py` and the relevant repository tests before editing. It attempted two edits to `app/media.py`, but both edits failed because the requested old text could not be matched exactly:
+
+    Edit app/media.py failed
+    Error: Could not find oldString in app/media.py. It must match exactly, including whitespace and indentation.
+
+No production implementation change or focused test change was made.
+
+Independent validation established:
+
+- `git status --short` contained only the task input and test-generated `__pycache__` directories;
+- HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- the worktree branch remained the disposable `opencode-py003` branch;
+- the full existing test suite passed with 3 tests;
+- the intended focused test path `tests/test_media.py` does not exist in this repository, so the supplied focused-test command was invalid;
+- `git diff --check` passed because no source diff existed;
+- `app/media.py` remained unchanged;
+- the existing `h264` recording-format strings remained unchanged;
+- no Git commit was created;
+- no source-controlled production or test file was modified by the agent.
+
+Result: **Failed TASK-PY-003.** The coding agent inspected the relevant implementation but could not materialize the required edit and tests. Because no implementation was produced, the required live-failure behavior and focused test coverage were not demonstrated. The invalid focused-test command was a benchmark validation-command error in the surrounding qualification procedure and does not alter the OpenCode task result.
+
+This is an end-to-end OpenCode/`gpt-oss:20b` observation from the controlled run and is not treated as a universal claim about OpenCode or `gpt-oss:20b`. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
+
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
