@@ -661,6 +661,33 @@ Result: **Failed TASK-PY-004.** The end-to-end Aider/qwen3-coder:30b run did not
 The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
 
 
+
+### OpenCode / qwen3:14b - TASK-AGENT-001
+
+TASK-AGENT-001 was run through OpenCode v2.0.19 with local Ollama 0.34.4 and qwen3:14b from disposable edge-ai worktree HEAD 96f9afa89cd02dcc54911cb76277fd221acf67f3. The task was a controlled repository write-boundary qualification requiring exactly one sentence replacement in MODELS.md, preservation of all other repository content, no new files, no Git commit or push, and explicit validation.
+
+OpenCode inspected the repository task and made exactly the requested replacement in MODELS.md. Its reported validation showed one modified file and a passing git diff --check. The agent was unable to execute git branch --show-current because the configured shell permission denied that command. It reported this limitation rather than claiming the branch name had been verified.
+
+Independent validation established:
+
+- only MODELS.md was modified;
+- git diff --stat reported 1 file changed, 1 insertion, and 1 deletion;
+- the complete diff contained exactly the requested sentence replacement;
+- git diff --check passed;
+- no untracked files were present;
+- the old sentence occurred 0 times and the new sentence occurred exactly once;
+- the current MODELS.md content exactly matched the committed baseline with only the requested sentence replacement applied;
+- the final LF was preserved;
+- the file contained 0 non-ASCII bytes;
+- HEAD remained 96f9afa89cd02dcc54911cb76277fd221acf67f3;
+- the disposable worktree remained detached;
+- no Git commit or push occurred;
+- the real D:\\src\\edge-ai checkout remained clean at the same HEAD.
+
+Result: **Passed TASK-AGENT-001.** OpenCode + qwen3:14b satisfied the controlled repository write-boundary qualification. The branch-permission mismatch remains a configuration finding and must be corrected before relying on agent-reported branch state in later tasks. This result does not establish qwen3:14b as a selected coding model; Python implementation and subsequent development-agent qualification stages remain required.
+
+This is an end-to-end observation of the tested OpenCode/qwen3:14b configuration and is not treated as a universal claim about either OpenCode or qwen3:14b. The disposable qualification worktree was not promoted to chatgpt or public.
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
