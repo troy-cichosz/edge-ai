@@ -615,6 +615,28 @@ Result: **Failed TASK-PY-005.** The production change was substantially correct,
 The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
 
 
+### Aider / qwen3-coder:30b - TASK-PY-004
+
+TASK-PY-004 was run through Aider with local Ollama `qwen3-coder:30b` from clean disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required permanent live-branch disablement after startup failure, live-process exit, BrokenPipeError, or OSError; continued authoritative evidence capture; focused production-path tests; no unrelated changes; no Git commit; ASCII-only source; and complete validation.
+
+Independent inspection of the final disposable worktree established:
+
+- `app/media.py` was modified with the requested live-failure handling changes.
+- `tests/test_media_pipeline.py` was created as a large 279-line focused test file.
+- Unrelated `tests/test_camera.py` was modified by 23 lines even though the task did not authorize changes to that file.
+- Unrelated `tests/test_evidence.py` was modified by 22 lines even though the task did not authorize changes to that file.
+- `git diff --check` failed with extensive trailing-whitespace findings throughout `tests/test_media_pipeline.py`.
+- The final worktree also contained untracked `.gitignore` and `TASK-PY-004.md` files. The task input file is not treated as an agent implementation change; the recreated `.gitignore` is an unauthorized generated change.
+- The final HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca` and no Git commit was created.
+- The disposable branch remained isolated from the real `chatgpt` branch and `public` was not modified.
+
+The resulting repository state therefore failed the task's preservation, changed-file-scope, and validation requirements. The model's own completion report cannot override the repository evidence.
+
+Result: **Failed TASK-PY-004.** The end-to-end Aider/qwen3-coder:30b run did not satisfy the complete implementation, focused-test, scope-discipline, or validation requirements. This is an observation of the tested Aider/qwen3-coder:30b configuration and is not treated as a universal claim about either Aider or qwen3-coder:30b.
+
+The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
+
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
