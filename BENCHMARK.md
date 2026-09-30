@@ -447,8 +447,9 @@ The run ended with Aider summarization failures after the test result. Those sum
 
 Result: **Failed TASK-PY-003.** This is an end-to-end Aider/qwen3:14b observation from the controlled run and is not treated as a universal claim about either Aider or qwen3:14b.
 
-The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.### Aider / devstral-small-2:latest - TASK-PY-004
+The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
 
+### Aider / devstral-small-2:latest - TASK-PY-004
 TASK-PY-004 was run through Aider against a clean disposable edge-video worktree at baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production paths and preserving the authoritative evidence branch.
 
 The run progressed into implementation and automated testing:
