@@ -147,7 +147,8 @@ All three current candidates failed to complete TASK-001.
 | Model | Result | Evidence |
 |---|---|---|
 | gemma3:4b | Failed | Native tool calling is unsupported; controlled text fallback did not produce the required file operation. No repository change. |
-| llama3.1:8b | Failed | Native tool capability was available, but the model returned a textual pseudo-tool call instead of a structured tool call. No repository change. || devstral-small-2:latest | Failed | Structured tool use succeeded for repository inspection, but the model stopped before performing the required `write_file`. No repository change. |
+| llama3.1:8b | Failed | Native tool capability was available, but the model returned a textual pseudo-tool call instead of a structured tool call. No repository change. |
+| devstral-small-2:latest | Failed | Structured tool use succeeded for repository inspection, but the model stopped before performing the required `write_file`. No repository change. |
 
 Earlier runner/harness defects encountered during development were corrected and are not counted as model-performance failures. The final Devstral TASK-001 run demonstrated that the structured tool path was operational.
 
@@ -197,7 +198,6 @@ Runtime measurement was completed on 2026-09-25 using Ollama 0.34.4. The benchma
 The earlier qwen3:14b run produced an empty visible `response` while generating 128 tokens. That run is not used as the corrected runtime result because the benchmark harness was subsequently changed to disable thinking and record the separate thinking field.
 
 TASK-003 was then run from the clean benchmark starting state. qwen3:14b used the structured `write_file` operation and reread `MODELS.md`, then ran `git_status`, `git_diff`, and `git_diff_check`. The required sentence replacement was not present in the resulting diff. Instead, the existing "Calabri" text was corrupted and the final newline was removed. The model then incorrectly reported that only the requested sentence had changed. The working tree was restored to the clean starting state after inspection.
-
 Result: **Failed TASK-003.** The runtime generation result is valid, but the tested coding-agent run did not satisfy the repository write-boundary, preservation, or self-validation requirements. The evidence does not by itself distinguish which portion of the encoding transformation originated in the model versus the tool/runner path; it does establish that the end-to-end coding-agent result was unacceptable for the controlled task.
 
 
@@ -296,7 +296,8 @@ The controlled results were:
 | OpenCode model | Result | Independent qualification evidence |
 |---|---|---|
 | `gpt-oss:20b` | **Passed** | Inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. |
-| `qwen3:14b` | **Passed** | Same exact `bafa0d1` fixture; inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. || `devstral-small-2:latest` | **Failed** | Made the requested replacement correctly, but then created unauthorized `verification_summary.txt` despite the explicit requirement that only `MODELS.md` may be modified. Independent `git status` confirmed the additional untracked file. |
+| `qwen3:14b` | **Passed** | Same exact `bafa0d1` fixture; inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. |
+| `devstral-small-2:latest` | **Failed** | Made the requested replacement correctly, but then created unauthorized `verification_summary.txt` despite the explicit requirement that only `MODELS.md` may be modified. Independent `git status` confirmed the additional untracked file. |
 
 For all three runs, `TASK-003.md` was the task input supplied before execution and is not counted as an agent repository modification. The `verification_summary.txt` created during the Devstral run is counted as an agent modification because the agent explicitly created it during task execution.
 
@@ -397,7 +398,6 @@ The Aider run produced the intended production change in app/media.py:
 
 - set self.live_enabled = False when the live process is already exited;
 - set self.live_enabled = False when the live pipe raises BrokenPipeError or OSError.
-
 The generated tests/test_media.py was not acceptable. The failure simulation was implemented on DummyProcess.write(), while the production code writes to live.stdin.write() and stdin was an io.BytesIO; therefore the simulated failure was never actually triggered. The tests also attempted to inspect BytesIO after the production shutdown path had closed it. Independent execution produced two failures:
 
 - test_live_failure_disables_live - ValueError: I/O operation on closed file;
@@ -597,7 +597,6 @@ Independent validation established:
 - no unrelated tracked file was modified;- the required focused tests and final validation/report were not completed.
 
 Result: **Failed TASK-PY-003.** The production edit was insufficient to demonstrate the required live HLS failure behavior, and the required focused tests were not produced. This is an end-to-end OpenCode/`gpt-oss:20b` observation from the controlled run and is not treated as a universal claim about either OpenCode or `gpt-oss:20b`. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
-
 ### Aider / qwen3-coder:30b - TASK-PY-005
 
 TASK-PY-005 was run through Aider with local Ollama `qwen3-coder:30b` from clean disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required a minimal evidence-envelope production change, a focused test using an actual populated `temporal_provenance.edge_time` context, preservation of the existing evidence metadata, no unrelated changes, no Git commit, and complete independent validation.
@@ -797,7 +796,6 @@ The initial qwen3:14b attempts against TASK-AGENT-002 did not materialize the re
 The qwen3-coder:30b run initially attempted Code Mode/`execute` and unsupported filesystem execution paths instead of the native OpenCode edit path. The OpenCode configuration was then adjusted to explicitly deny `execute`, allow native `read`, `glob`, `grep`, and `edit`, restrict `edit` to `app/evidence.py`, and restrict shell access to validation commands. The pytest permission was also defined for `python -B -m pytest` so test execution would not create bytecode artifacts.
 
 With that controlled configuration, qwen3-coder:30b successfully:
-
 - read README.md, docs/ARCHITECTURE.md, pyproject.toml, app/evidence.py, and tests/test_evidence.py;
 - used the native OpenCode `edit` tool;
 - changed only `"end": None,` to `"end": capture["end_utc"],` in `app/evidence.py`;
@@ -825,4 +823,3 @@ Independent validation established:
 Result: **Passed TASK-AGENT-002.** This establishes a working OpenCode native-tool Python implementation PoC for the tested qwen3-coder:30b configuration. The result is an end-to-end observation of the tested OpenCode/qwen3-coder:30b configuration and is not treated as a universal claim about either OpenCode or qwen3-coder:30b. It does not select qwen3-coder:30b as a coding default; subsequent multi-file, cross-service, continuation, and independent-review stages remain required.
 
 The disposable edge-video qualification worktree was not promoted to `chatgpt` or `public`.
-
