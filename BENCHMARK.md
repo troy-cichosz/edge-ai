@@ -578,6 +578,43 @@ Independent validation established:
 
 Result: **Failed TASK-PY-003.** The production edit was insufficient to demonstrate the required live HLS failure behavior, and the required focused tests were not produced. This is an end-to-end OpenCode/`gpt-oss:20b` observation from the controlled run and is not treated as a universal claim about either OpenCode or `gpt-oss:20b`. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
 
+### Aider / qwen3-coder:30b - TASK-PY-005
+
+TASK-PY-005 was run through Aider with local Ollama `qwen3-coder:30b` from clean disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required a minimal evidence-envelope production change, a focused test using an actual populated `temporal_provenance.edge_time` context, preservation of the existing evidence metadata, no unrelated changes, no Git commit, and complete independent validation.
+
+A first qwen3-coder:30b attempt was interrupted after Aider proposed an incorrect replacement implementation based on invented repository structure. Independent inspection showed that `app/evidence.py` remained unchanged and `tests/test_evidence_envelope.py` was not created. The disposable worktree was cleaned before the second attempt.
+
+The second attempt correctly inspected the existing implementation and materialized the following changes:
+
+- `app/evidence.py` changed only `build_evidence_envelope()` so that `capture["end"]` is populated from `capture["end_utc"]`.
+- `tests/test_evidence_envelope.py` was created with a primary test that exercises the real `build_evidence_envelope()` path and supplies a non-None `temporal_provenance.edge_time` context.
+- The primary test verifies capture start, finalized capture end, monotonic start, temporal context presence, and several authoritative artifact fields.
+
+However, the end-to-end task did not satisfy the acceptance requirements:
+
+- Aider did not complete the required validation cycle before the run was interrupted.
+- The focused test was not run.
+- The full existing test suite was not run.
+- `git diff --check` failed with eight trailing-whitespace findings in the new test file.
+- The test file contained unused imports and unnecessary additional no-time-context coverage.
+- The authoritative artifact test did not verify all required artifact fields.
+- The production change included an unnecessary explanatory inline comment.
+- Aider recreated the prohibited `.gitignore` file during startup despite the task explicitly prohibiting it.
+
+Independent repository inspection after the run showed:
+
+- HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- `app/evidence.py` had the one-line requested production change;
+- `tests/test_evidence_envelope.py` contained the generated focused tests;
+- no Git commit was created;
+- the required validation evidence was incomplete;
+- `git diff --check` failed.
+
+Result: **Failed TASK-PY-005.** The production change was substantially correct, but the end-to-end Aider/qwen3-coder:30b run did not satisfy the complete implementation, test-quality, scope, and validation requirements. This is an observation of the tested Aider/qwen3-coder:30b configuration and is not treated as a universal claim about either Aider or qwen3-coder:30b.
+
+The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
+
+
 ## Phase 3 - Independent Review
 
 A separate review invocation/model must inspect each coding result against:
