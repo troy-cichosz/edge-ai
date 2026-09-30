@@ -447,8 +447,7 @@ The run ended with Aider summarization failures after the test result. Those sum
 
 Result: **Failed TASK-PY-003.** This is an end-to-end Aider/qwen3:14b observation from the controlled run and is not treated as a universal claim about either Aider or qwen3:14b.
 
-The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
-### Aider / devstral-small-2:latest - TASK-PY-004
+The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.### Aider / devstral-small-2:latest - TASK-PY-004
 
 TASK-PY-004 was run through Aider against a clean disposable edge-video worktree at baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production paths and preserving the authoritative evidence branch.
 
@@ -828,3 +827,46 @@ Result: **Passed TASK-AGENT-002.** This establishes a working OpenCode native-to
 
 The disposable edge-video qualification worktree was not promoted to `chatgpt` or `public`.
 
+### OpenCode / qwen3-coder:30b - TASK-AGENT-003
+
+TASK-AGENT-003 was run through OpenCode v2.0.19 with local Ollama 0.34.4 and qwen3-coder:30b from disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required a controlled multi-file Python implementation and focused pytest coverage, with authorized changes limited to `app/evidence.py` and `tests/test_evidence.py`, no new repository files, no Git commit or push, and complete validation.
+
+The task definition SHA-256 was `2D932ADAE3E57509F7D3C13EC6B04A59D11657C6D235830D86D56ED91659DF0B`.
+
+OpenCode inspected the required repository context before editing:
+
+- README.md
+- docs/ARCHITECTURE.md
+- pyproject.toml
+- app/evidence.py
+- tests/test_evidence.py
+- TASK-AGENT-003.md
+
+The agent then used the native OpenCode edit tool and made the requested production and test changes:
+
+- `app/evidence.py`: changed the evidence envelope capture end field to use `capture.get("end_utc")`, preserving `None` when the manifest has no `end_utc`.
+- `tests/test_evidence.py`: imported `build_evidence_envelope()` and added focused tests covering both a manifest with `capture.end_utc` and a manifest without it.
+- No other repository files were modified.
+- No commit or push was performed.
+
+The agent initially introduced trailing whitespace in the test changes. It detected the resulting `git diff --check` findings, corrected them, and reran the available test and diff validation. The agent reported 5 pytest tests passing, but independent validation remained authoritative.
+
+Independent validation established:
+
+- `git status --short --untracked-files=all` contained exactly `app/evidence.py` and `tests/test_evidence.py` as modified files;
+- `git diff --stat` showed 2 files changed, 60 insertions, and 2 deletions;
+- the complete diff matched the authorized production change and the two focused tests;
+- `git diff --check` passed;
+- `python -B -m pytest` passed all 5 tests;
+- direct validation confirmed present `end_utc` produces the exact envelope end value;
+- direct validation confirmed absent `end_utc` produces `None`;
+- both modified files were independently verified ASCII-only;
+- both modified files were independently verified to have a final LF;
+- HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- the disposable qualification worktree remained detached;
+- no Git commit or push occurred;
+- the real `D:\\src\\edge-video` checkout remained clean at the same HEAD.
+
+Result: **Passed TASK-AGENT-003.** This establishes a successful OpenCode/qwen3-coder:30b multi-file Python implementation and test qualification for the tested configuration. It is an end-to-end observation of the tested OpenCode/qwen3-coder:30b configuration and is not treated as a universal claim about either OpenCode or qwen3-coder:30b. It does not by itself establish a final coding-model selection; cross-service, project-continuation, independent-review, and human-acceptance stages remain required.
+
+The disposable edge-video qualification worktree was not promoted to `chatgpt` or `public`.
