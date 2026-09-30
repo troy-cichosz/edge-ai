@@ -11,6 +11,15 @@ Before changing this repository, the agent must read:
 
 If the task affects an AI Legal Platform repository, the agent must also read that repository's current instructions and authoritative architecture/status documentation.
 
+## Framework and Tool Boundary
+
+The coding model operates through a qualified agent framework and its configured tools. The model is not the complete control boundary.
+
+Before editing, the framework must establish the actual repository and branch state and load the applicable project rules. Write, command-execution, filesystem, and Git permissions must be scoped to the task where the framework supports those controls.
+
+The agent must not treat its own report as authoritative proof of repository state. The actual filesystem, Git status, diff, tests, and independent review determine whether the task was completed correctly.
+
+During qualification and controlled tasks, generated task files, logs, caches, verification artifacts, and unrelated files are unauthorized unless explicitly required by the task. Unauthorized changes are a failed result even when the requested implementation is otherwise correct.
 ## Core Rules
 
 - Preserve existing architecture and working behavior unless the task explicitly changes them.

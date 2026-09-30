@@ -34,7 +34,9 @@ Candidate models should be evaluated for:
 - diff quality;
 - resistance to unrelated rewrites;
 - long-context repository comprehension;
-- tool-use reliability;
+- tool-use reliability within the selected framework;
+- framework tool-permission adherence;
+- repository write-boundary preservation;
 - testing and debugging quality;
 - documentation and project-state accuracy;
 - diff/self-validation accuracy;
@@ -69,7 +71,10 @@ The workstation currently has:
 - llama3.1:8b;
 - devstral-small-2:latest;
 - qwen3:14b;
-- gpt-oss:20b.
+- gpt-oss:20b;
+- qwen3-coder:30b.
+
+These are installed and verified local models. They are not selected defaults for any agent role.
 
 These are the currently verified local models and are not yet selected defaults for any agent role.
 

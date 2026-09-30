@@ -32,6 +32,17 @@ Development changes are made on GitHub `chatgpt`. GitHub `public` remains a rele
 
 `edge-platform-automation` synchronizes accepted GitHub `chatgpt` source to ADO. Existing ADO CI/CD and runtime verification remain part of the release path.
 
+## D-009 - Framework and Model Are Separate Components
+
+The local development-agent architecture separates the agent framework/tool layer from the local model. Framework qualification precedes model optimization.
+
+The qualified unit is the framework, model, repository rules, tool permissions, repository/worktree boundary, and independent validation together. A model is not accepted as a coding-agent default based on isolated generation quality.
+
+## D-010 - Deterministic Boundaries and Independent Validation
+
+Hard repository, branch, permission, and release boundaries must be enforced deterministically where practical rather than relying solely on model instruction following.
+
+The coding agent's own report is informational. Actual repository state, tests, diff inspection, and independent compliance/review evidence are authoritative for acceptance.
 ## D-009 - Model Selection Is Replaceable
 
 Model names and versions may change as benchmarking identifies better local choices. Agent contracts and project rules must not depend on a single model vendor or model family.

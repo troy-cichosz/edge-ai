@@ -13,29 +13,37 @@ Those repositories remain authoritative for their own implementation, service co
 ## Role Architecture
 
 ```text
-Human
-  |
-  +--> ChatGPT: architecture / requirements / cross-repository reasoning
-  |
-  v
+Human / ChatGPT
+      |
+      v
 GitHub Issue / scoped task
-  |
-  v
+      |
+      v
+Qualified Agent Framework
+      |
+      +--> repository rules
+      +--> scoped tools and permissions
+      +--> repository/worktree boundary
+      |
+      v
+Local Ollama Model
+      |
+      v
 Coding Agent
-  |
-  v
+      |
+      v
 Independent Rules / Compliance Agent
-  |
-  v
+      |
+      v
 Testing / Review Agents
-  |
-  v
+      |
+      v
 GitHub chatgpt
-  |
-  v
+      |
+      v
 edge-platform-automation
-  |
-  v
+      |
+      v
 ADO chatgpt
 ```
 
@@ -45,6 +53,25 @@ Model choice is a replaceable implementation detail. Agent contracts, repository
 
 A stronger model may be selected for coding, while a separate model or invocation is used for compliance. The system must not assume that the same model can reliably enforce its own work.
 
+## Agent Configuration Boundary
+
+The qualified unit is the complete development-agent configuration:
+
+```text
+Agent Framework
+    +
+Local Model
+    +
+Repository Rules
+    +
+Tool Permissions
+    +
+Repository/Worktree Boundary
+    +
+Independent Validation
+```
+
+The framework and model are replaceable components. A model that performs well in isolation is not thereby a qualified coding agent. Deterministic repository, branch, permission, and release controls must not depend solely on model instruction following.
 ## Repository Context
 
 Agents must construct context from source-controlled files and the current task rather than relying on conversational memory alone.

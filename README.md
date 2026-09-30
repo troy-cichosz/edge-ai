@@ -110,15 +110,17 @@ The local AI environment does not bypass GitHub source control, repository instr
 
 Initial repository structure and governance are established.
 
-The next implementation increment is intentionally small and begins with the **existing Ollama installation**, not a new installation:
-1. verify the installed Ollama version and local model inventory;
-2. establish the workstation/GPU resource baseline;
-3. identify and benchmark candidate local models for the defined agent roles;
-4. select model-to-role and resource policy from observed benchmark results;
-5. establish controlled local agent execution;
-6. validate a coding agent against a low-risk real repository task;
-7. add independent compliance and testing stages;
+The next implementation increment is intentionally focused on establishing a controlled local development-agent configuration:
+1. qualify an established free/open-source repository-oriented agent framework;
+2. qualify its repository, filesystem, tool, permission, and write boundaries;
+3. validate a minimal controlled repository task with one local model;
+4. validate representative Python and multi-file repository work;
+5. evaluate local models within the qualified framework;
+6. add independent compliance and testing stages;
+7. validate cross-repository and project-state continuation;
 8. document the resulting operating procedure.
+
+Model selection therefore follows framework and tool-boundary qualification. Ollama installation itself is already complete on the baseline Windows workstation.
 
 Ollama installation itself is already complete on the baseline Windows workstation. Reinstallation or replacement is not part of this increment unless verification identifies a concrete problem.
 

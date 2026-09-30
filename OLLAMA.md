@@ -12,12 +12,16 @@ The workstation baseline has been verified locally:
 - gemma3:4b
 - llama3.1:8b
 - devstral-small-2:latest
+- qwen3:14b
+- gpt-oss:20b
+- qwen3-coder:30b
 
 The exact installed Ollama version and available model inventory should remain benchmark evidence rather than being assumed from documentation. Re-run the verification commands when the workstation baseline changes:
 
     ollama --version
     ollama list
 
+The current verified model inventory is an installation baseline only. A model is not considered a coding-agent default until it is evaluated inside the qualified agent framework and passes the required repository-task and independent-review gates.
 ## Workstation Resource Baseline
 
 The current benchmark workstation is a Dell Precision Tower 3620 with:

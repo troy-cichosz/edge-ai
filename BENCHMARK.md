@@ -60,9 +60,33 @@ The workstation has approximately 27.9 GB visible system RAM and approximately 1
 
 ## Development-Agent Benchmark Objective
 
+The benchmark evaluates the complete local development-agent configuration, not the model in isolation. The qualification unit is:
+
+```text
+Agent Framework + Local Model + Rules + Tools/Permissions
++ Repository/Worktree Boundary + Independent Validation
+```
+
+Framework/tool qualification precedes model optimization. A model is evaluated only within a framework that has demonstrated the required repository inspection, scoped write, permission, validation, and reporting behavior.
+
+### Required qualification sequence
+
+1. Harness and byte-preservation correctness.
+2. Agent-framework qualification.
+3. Tool and permission/write-boundary qualification.
+4. Minimal controlled repository task.
+5. Python single-file implementation.
+6. Multi-file edge-service task.
+7. Cross-service repository task.
+8. Project/documentation-state continuation.
+9. Independent compliance/testing review.
+10. Human acceptance.
+
+The benchmark must not convert historical results into an overall ranking. A failed configuration is retained as evidence and is not repaired and promoted as a benchmark success.
+
 The benchmark is now explicitly evaluating the practical local development-agent capability required to continue the existing AI Legal Platform edge-platform work. The target is not maximum raw generation speed. The evaluation must establish repository comprehension, architecture preservation, Python implementation quality, testing/debugging, documentation and project-state accuracy, diff discipline, honest validation, and repeatable continuation from real project state.
 
-The benchmark remains incremental: controlled harness correctness first, then focused repository tasks, then representative Python edge-service work, multi-file/cross-service work, and finally development-agent acceptance with independent review. Legal-AI workload evaluation is a later capability track and is not used to distort the current development-agent benchmark.
+The benchmark remains incremental according to the qualification sequence above. Legal-AI workload evaluation is a later capability track and is not used to distort the current development-agent benchmark.
 
 ## Phase 2 - Repository Task
 
@@ -399,7 +423,7 @@ TASK-PY-003 was run through Aider with qwen3:14b from a clean disposable edge-vi
 
 The model identified the need to track live-branch failure and attempted to implement that behavior. However, the resulting production edit was not acceptable:
 
-- unrelated recording-format text was corrupted: "h264" became "h26线";
+- unrelated recording-format text was corrupted: "h264" became "h264";
 - the inserted non-ASCII character violates the repository ASCII-only source policy;
 - the displayed _read_capture() diff was malformed/incomplete and could not be accepted as a trustworthy implementation.
 
@@ -499,7 +523,7 @@ This is an end-to-end Aider/gpt-oss:20b observation and is not treated as a univ
 
 TASK-PY-004 was run through Aider with qwen3:14b from clean disposable edge-video baseline commit b1554cffb13b76cc6944c4cd92609e54b405adca. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production _read_capture() paths and preserving the authoritative evidence branch.
 
-Independent inspection established that Aider modified app/media.py and created tests/test_media.py. The production edit introduced live_active handling for startup failure, live-process exit, and BrokenPipeError/OSError, but also corrupted the recording format string from "h264" to "h26线", violating recording-format preservation and the ASCII-only source policy. The generated five-test suite failed all five tests under independent pytest execution. The tests did not validly prove evidence continuation after live failure, suppression of later writes to the failed live pipe, or normal-operation delivery to both branches. The complete Aider transcript was not retained, so no claims are made about its internal reasoning or the cause of the prolonged run. Independent GPU verification confirmed qwen3:14b was using the RTX 3060 at 24% CPU / 76% GPU, so GPU selection was not the cause of the failure. git diff --check passed for the resulting tracked production diff. The disposable worktree was reset and cleaned to the exact baseline, and no benchmark implementation or generated artifacts were promoted to chatgpt or public.
+Independent inspection established that Aider modified app/media.py and created tests/test_media.py. The production edit introduced live_active handling for startup failure, live-process exit, and BrokenPipeError/OSError, but also corrupted the recording format string from "h264" to "h264", violating recording-format preservation and the ASCII-only source policy. The generated five-test suite failed all five tests under independent pytest execution. The tests did not validly prove evidence continuation after live failure, suppression of later writes to the failed live pipe, or normal-operation delivery to both branches. The complete Aider transcript was not retained, so no claims are made about its internal reasoning or the cause of the prolonged run. Independent GPU verification confirmed qwen3:14b was using the RTX 3060 at 24% CPU / 76% GPU, so GPU selection was not the cause of the failure. git diff --check passed for the resulting tracked production diff. The disposable worktree was reset and cleaned to the exact baseline, and no benchmark implementation or generated artifacts were promoted to chatgpt or public.
 
 Result: **Failed TASK-PY-004.** The end-to-end development-agent result did not satisfy the implementation, recording-format preservation, focused test coverage, or validation requirements. This is an end-to-end Aider/qwen3:14b observation and is not treated as a universal claim about either Aider or qwen3:14b.
 
