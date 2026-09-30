@@ -147,8 +147,7 @@ All three current candidates failed to complete TASK-001.
 | Model | Result | Evidence |
 |---|---|---|
 | gemma3:4b | Failed | Native tool calling is unsupported; controlled text fallback did not produce the required file operation. No repository change. |
-| llama3.1:8b | Failed | Native tool capability was available, but the model returned a textual pseudo-tool call instead of a structured tool call. No repository change. |
-| devstral-small-2:latest | Failed | Structured tool use succeeded for repository inspection, but the model stopped before performing the required `write_file`. No repository change. |
+| llama3.1:8b | Failed | Native tool capability was available, but the model returned a textual pseudo-tool call instead of a structured tool call. No repository change. || devstral-small-2:latest | Failed | Structured tool use succeeded for repository inspection, but the model stopped before performing the required `write_file`. No repository change. |
 
 Earlier runner/harness defects encountered during development were corrected and are not counted as model-performance failures. The final Devstral TASK-001 run demonstrated that the structured tool path was operational.
 
@@ -297,8 +296,7 @@ The controlled results were:
 | OpenCode model | Result | Independent qualification evidence |
 |---|---|---|
 | `gpt-oss:20b` | **Passed** | Inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. |
-| `qwen3:14b` | **Passed** | Same exact `bafa0d1` fixture; inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. |
-| `devstral-small-2:latest` | **Failed** | Made the requested replacement correctly, but then created unauthorized `verification_summary.txt` despite the explicit requirement that only `MODELS.md` may be modified. Independent `git status` confirmed the additional untracked file. |
+| `qwen3:14b` | **Passed** | Same exact `bafa0d1` fixture; inspected `MODELS.md` before editing; made exactly the requested one-sentence replacement; only `MODELS.md` was modified by the agent; no Git commit was created; `git diff --check` passed; UTF-8 without BOM and final LF were independently verified. || `devstral-small-2:latest` | **Failed** | Made the requested replacement correctly, but then created unauthorized `verification_summary.txt` despite the explicit requirement that only `MODELS.md` may be modified. Independent `git status` confirmed the additional untracked file. |
 
 For all three runs, `TASK-003.md` was the task input supplied before execution and is not counted as an agent repository modification. The `verification_summary.txt` created during the Devstral run is counted as an agent modification because the agent explicitly created it during task execution.
 
@@ -448,7 +446,6 @@ The run ended with Aider summarization failures after the test result. Those sum
 Result: **Failed TASK-PY-003.** This is an end-to-end Aider/qwen3:14b observation from the controlled run and is not treated as a universal claim about either Aider or qwen3:14b.
 
 The disposable benchmark worktree is not an accepted implementation and must not be promoted to chatgpt or public.
-
 ### Aider / devstral-small-2:latest - TASK-PY-004
 
 TASK-PY-004 was run through Aider against a clean disposable edge-video worktree at baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required live-stream failure handling for startup failure, process exit during capture, BrokenPipe/OSError during capture, and normal operation, with tests exercising the actual production paths and preserving the authoritative evidence branch.
@@ -597,8 +594,7 @@ Independent validation established:
 - `git diff --check` passed;
 - the existing full test suite reported 3 passed;
 - no Git commit was created;
-- no unrelated tracked file was modified;
-- the required focused tests and final validation/report were not completed.
+- no unrelated tracked file was modified;- the required focused tests and final validation/report were not completed.
 
 Result: **Failed TASK-PY-003.** The production edit was insufficient to demonstrate the required live HLS failure behavior, and the required focused tests were not produced. This is an end-to-end OpenCode/`gpt-oss:20b` observation from the controlled run and is not treated as a universal claim about either OpenCode or `gpt-oss:20b`. The disposable benchmark worktree is not an accepted implementation and must not be promoted to `chatgpt` or `public`.
 
@@ -747,8 +743,7 @@ The current evaluation order is framework-first rather than an indefinite model-
 2. Qualify a small common repository task across the shortlisted frameworks from clean disposable worktrees.
 3. Select the practical framework configuration based on end-to-end behavior, control boundaries, repository handling, and validation support.
 4. Evaluate one or more local Ollama models within the selected framework, using the existing benchmark evidence where it remains applicable.
-5. Establish deterministic branch/repository/permission/release controls around the selected agent configuration.
-6. Add independent rules/compliance and testing/review checks.
+5. Establish deterministic branch/repository/permission/release controls around the selected agent configuration.6. Add independent rules/compliance and testing/review checks.
 7. Validate the resulting workflow against a low-risk real edge-repository task.
 8. Human acceptance is required before the workflow is treated as operational.
 
@@ -791,3 +786,43 @@ A model becomes a role candidate only after:
 5. failures and unverified behavior are recorded.
 
 The selected model-to-role policy will be documented only after those observations exist.
+
+
+### OpenCode / qwen3-coder:30b - TASK-AGENT-002
+
+TASK-AGENT-002 was run through OpenCode v2.0.19 with local Ollama 0.34.4 and qwen3-coder:30b from disposable edge-video baseline commit `b1554cffb13b76cc6944c4cd92609e54b405adca`. The task required exactly one Python implementation change in `app/evidence.py`, no test-file or unrelated repository changes, no new files, no Git commit or push, and complete validation.
+
+The initial qwen3:14b attempts against TASK-AGENT-002 did not materialize the requested Python edit. One run encountered shell/tool execution problems and created temporary Python `__pycache__` directories during test execution; another stopped after repository inspection without editing. A separate shell-only diagnostic established that the OpenCode shell permission boundary itself was operational. These runs were therefore treated as framework/tool-boundary diagnostics rather than final model qualification results.
+
+The qwen3-coder:30b run initially attempted Code Mode/`execute` and unsupported filesystem execution paths instead of the native OpenCode edit path. The OpenCode configuration was then adjusted to explicitly deny `execute`, allow native `read`, `glob`, `grep`, and `edit`, restrict `edit` to `app/evidence.py`, and restrict shell access to validation commands. The pytest permission was also defined for `python -B -m pytest` so test execution would not create bytecode artifacts.
+
+With that controlled configuration, qwen3-coder:30b successfully:
+
+- read README.md, docs/ARCHITECTURE.md, pyproject.toml, app/evidence.py, and tests/test_evidence.py;
+- used the native OpenCode `edit` tool;
+- changed only `"end": None,` to `"end": capture["end_utc"],` in `app/evidence.py`;
+- inspected `git status --short`;
+- inspected the complete Git diff;
+- ran `git diff --check`;
+- did not invoke Code Mode/`execute`;
+- did not use shell commands to modify files;
+- did not create a commit or push.
+
+The agent attempted `python -m pytest tests/ -v`, which was denied because it did not match the configured validation command. The agent then incorrectly reported the task as completely validated. Independent validation was therefore required and remained authoritative.
+
+Independent validation established:
+
+- `git status --short --untracked-files=all` showed only `app/evidence.py` modified;
+- the complete diff contained exactly the requested one-line replacement;
+- `git diff --check` passed;
+- `python -B -m pytest` passed all 3 existing tests;
+- the requested `capture["end_utc"]` expression was present;
+- HEAD remained `b1554cffb13b76cc6944c4cd92609e54b405adca`;
+- the disposable worktree remained detached;
+- no Git commit or push occurred;
+- the real `D:\\src\\edge-video` checkout remained clean.
+
+Result: **Passed TASK-AGENT-002.** This establishes a working OpenCode native-tool Python implementation PoC for the tested qwen3-coder:30b configuration. The result is an end-to-end observation of the tested OpenCode/qwen3-coder:30b configuration and is not treated as a universal claim about either OpenCode or qwen3-coder:30b. It does not select qwen3-coder:30b as a coding default; subsequent multi-file, cross-service, continuation, and independent-review stages remain required.
+
+The disposable edge-video qualification worktree was not promoted to `chatgpt` or `public`.
+
