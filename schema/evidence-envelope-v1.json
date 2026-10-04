@@ -30,7 +30,7 @@
       "required": ["start", "end"],
       "additionalProperties": true,
       "properties": {
-        "start": { "type": ["string", "null"], "format": "date-time" },
+        "start": { "type": "string", "format": "date-time" },
         "end": { "type": ["string", "null"], "format": "date-time" }
       }
     },
