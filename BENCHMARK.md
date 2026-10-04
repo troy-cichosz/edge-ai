@@ -918,3 +918,24 @@ The controlled development-agent sequence has now established successful results
 The next qualification stage should test planning and independent review rather than continue accumulating small coding tasks. The intended next task is a controlled planning/review benchmark with no implementation promotion.
 
 No qualification worktree result has been promoted to GitHub `chatgpt` or `public`.
+
+
+### TASK-AGENT-006 - Planning Qualification Checkpoint - 2026-10-04
+
+TASK-AGENT-006 was executed as a planning-only qualification against disposable edge-video and edge-audio worktrees. The objective was to test repository comprehension, architecture preservation, scope discipline, explicit handling of unavailable information, and separation of planning from implementation.
+
+The planner was required to create only PLAN-AGENT-006.md. No application, test, documentation, configuration, dependency, Docker, or Git changes were authorized.
+
+The initial planner invocation attempted to read the sibling edge-audio qualification worktree and was blocked by the OpenCode external-directory permission boundary. The run was stopped rather than granting broader access. A read-only inspection snapshot of the required edge-audio files was then supplied inside the primary qualification worktree and the planner was relaunched with an explicit prohibition against accessing the original sibling worktree. This workaround preserved the repository boundary.
+
+The planner produced a repository-specific plan covering verified edge-video and supplied edge-audio state; exact proposed common evidence-model and manifest scope; likely files and reasons; existing interfaces/contracts to preserve; evidence immutability; Capture Time Context and temporal-provenance requirements; cross-service compatibility; focused and integration testing; documentation/status updates; risks, ambiguities, unresolved questions, out-of-scope work; acceptance criteria; implementation sequence; and explicit separation of verified facts, recommendations, and unavailable information.
+
+The planner correctly identified that no canonical shared evidence-model package/contract was found in the inspected trees and did not invent one. It also correctly identified unresolved decisions around the canonical contract location, Capture Time Context required-versus-optional fields, common-envelope versus service-specific manifest layering, audio versus video persistence strategy, temporal-unavailability representation, and audio metadata atomicity.
+
+The plan was therefore **PASS / QUALIFIED as planning behavior, but NOT implementation-ready**. The unresolved contract and architecture decisions must be explicitly resolved before any service implementation begins. Implementation must not proceed from the proposed common schema until an authoritative common contract/location and the required/optional Capture Time Context field set are approved.
+
+The plan was uploaded by the user to the edge-ai public branch for review/reference. This does not constitute implementation promotion and no service code was changed or promoted.
+
+The next step is **TASK-AGENT-006 independent review**. The independent reviewer must inspect the plan against the actual repository state and supplied edge-audio snapshot, identify unsupported assumptions or missing requirements, and produce a review artifact without modifying implementation repositories or approving implementation by itself.
+
+No model, framework, or implementation has been selected or promoted as a result of TASK-AGENT-006.
