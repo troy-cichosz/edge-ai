@@ -170,6 +170,8 @@ Expected implementation areas are limited to the existing evidence/recorder/time
 - focused time-context/evidence-envelope tests
 - relevant README/status/sprint documentation only where required to describe the implemented behavior
 
+For finalized envelope persistence, app/recorder.py must explicitly implement or invoke the required temp-file-in-same-directory, flush/close, and atomic-rename discipline; this atomicity work is part of the authorized audio scope and must not be treated as optional.
+
 Do not rewrite unrelated audio code.
 
 ## Required Tests
@@ -178,16 +180,19 @@ At minimum, implementation validation must establish:
 
 1. Both services can produce an envelope conforming to ai-legal.evidence.envelope.v1.
 2. Both services use the same canonical Capture Time Context contract.
-3. Temporal unavailable state is represented identically by both services.
-4. time_semantics values conform to the controlled vocabulary.
-5. Finalized capture.end is derived from end_utc.
-6. Existing raw media is unchanged.
-7. Existing authoritative manifest bytes are unchanged after envelope addition.
-8. Envelope sidecar writes are atomic according to the service's existing atomic-write mechanism.
-9. Failure of envelope creation does not corrupt or invalidate the existing authoritative manifest.
-10. Per-service fixtures validate independently against the common contract.
-11. Existing service tests continue to pass.
-12. No unrelated files are modified.
+3. Each service has a fully populated Capture Time Context fixture containing all 20 canonical members with available values, and that fixture serializes and validates against the common contract.
+4. Temporal unavailable state is represented identically by both services.
+5. time_semantics values conform to the controlled vocabulary.
+6. Finalized capture.end is derived from end_utc.
+7. When end_utc is present, the serialized envelope capture.end exactly matches the authoritative manifest end_utc, including fractional-second precision; when end_utc is absent, envelope capture.end is null.
+8. Envelopes with an unknown or malformed schema/major-version identifier are rejected by validation.
+9. Existing raw media is unchanged.
+10. Existing authoritative manifest bytes are unchanged after envelope addition.
+11. Finalized envelope sidecar writes are atomic: the implementation uses a temporary file in the same directory, flushes/closes it, and atomically renames it to the finalized sidecar path. The edge-audio test must explicitly cover the recorder.py/save_metadata path or the actual envelope persistence path that provides this guarantee.
+12. Failure of envelope creation does not corrupt or invalidate the existing authoritative manifest, leaves no partial finalized envelope, surfaces the failure, and makes the evidence distinguishable as missing its envelope.
+13. Per-service fixtures validate independently against the common contract.
+14. Existing service tests continue to pass.
+15. No unrelated files are modified.
 
 Where two-file crash consistency cannot be made transactional, tests must verify the explicitly documented failure state rather than asserting unsupported both-or-neither semantics.
 
