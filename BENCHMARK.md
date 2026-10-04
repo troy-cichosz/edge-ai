@@ -1008,3 +1008,33 @@ The plan was revised to resolve the review blockers before any service implement
 The decision record was also corrected so the decision identifiers are unique and the Evidence Envelope decisions are now D-012/D-013 after resolving the pre-existing duplicate D-010 numbering.
 
 No edge-video, edge-audio, edge-time, edge-controller, or GitHub `public` implementation changes are authorized by this revision. The next gate is an independent review of the corrected plan and contract artifacts.
+
+### TASK-AGENT-006 - Implementation Qualification - OpenCode / qwen3-coder:30b - 2026-10-04
+
+The corrected TASK-AGENT-006 plan and normative evidence-envelope contract passed independent review before implementation was authorized. The implementation qualification then began in disposable edge-video and edge-audio worktrees using OpenCode 2.0.19, local Ollama 0.34.4, and qwen3-coder:30b. The edge-video implementation run was performed from disposable baseline `b1554cffb13b76cc6944c4cd92609e54b405adca`. The real `D:\\src\\edge-video` checkout remained outside the qualification worktree.
+
+The local inference path was independently smoke-tested before this run:
+
+- OpenCode reported `qwen3-coder:30b` as the active model.
+- The effective OpenCode configuration resolved to provider `ollama`, model `qwen3-coder:30b`, base URL `http://localhost:11434/v1`.
+- Direct Ollama API checks and `ollama list` confirmed the model was available.
+- `opencode run` returned the expected response using `qwen3-coder:30b`.
+- No hosted OpenCode model was used in the valid implementation qualification run.
+
+The qualification run did not produce an implementation. The model repeatedly failed to use the available repository-inspection interface correctly and did not progress to the authorized edit/validation phases. Observed execution behavior included:
+
+- an invented `tools.read` call, which failed because that tool was unavailable;
+- attempts to invoke other unavailable or inappropriate tool names such as `grep` and `explore.find-files`;
+- repeated Unix-style shell commands such as `ls -la` in Windows PowerShell, producing command failures;
+- recovery through `dir`, `Get-ChildItem`, and other available inspection paths, followed by repeated inspection loops rather than implementation;
+- an apparent inspection of `app/controller.py` even though the actual repository file listing did not establish that file as present. This was treated as unreliable model/tool-use behavior rather than repository evidence.
+
+The model did establish the correct detached HEAD and clean worktree and inspected several relevant edge-video files, including `app/evidence.py`, `app/recorder.py`, `app/main.py`, `app/time.py`, `app/media.py`, `app/stream.py`, and `docs/EVIDENCE_SCHEMA.md`. However, after multiple prompts and approximately six minutes of execution, it stopped again without editing or running the required implementation tests.
+
+No source files, tests, documentation, dependencies, manifests, or generated implementation artifacts were accepted from this run. No commit or push was created. The disposable worktree remained at the baseline and the real service checkout and GitHub `public` branch were not modified.
+
+An earlier TASK-AGENT-006 invocation had accidentally displayed an OpenCode hosted `Fledge Alpha Free` model and was stopped. That invocation is invalid benchmark evidence and is not counted. The valid implementation run used the local Ollama configuration described above.
+
+Result: **Failed TASK-AGENT-006 implementation qualification for the tested OpenCode 2.0.19 + Ollama 0.34.4 + qwen3-coder:30b configuration.** The failure is specifically an end-to-end agent execution/tool-use qualification failure: the agent did not complete the authorized implementation and validation sequence. It is not evidence that qwen3-coder:30b cannot produce the required code in another framework or configuration, and it does not invalidate the earlier successful TASK-AGENT-002, TASK-AGENT-003, TASK-AGENT-004, or TASK-AGENT-005 observations.
+
+This result must remain a failed qualification record. The disposable worktree must not be repaired and promoted as a benchmark success. No final framework or model default is selected from this result.

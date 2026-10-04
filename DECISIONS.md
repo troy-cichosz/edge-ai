@@ -79,3 +79,9 @@ The increment must prove raw-media and authoritative-manifest immutability.
 ## D-013 - Evidence Envelope Development Gate
 
 The approved Evidence Envelope architecture may be implemented only after the corrected TASK-AGENT-006 plan and contract artifacts pass independent review. Planning, implementation, testing, and compliance review remain separate qualification stages. No implementation is authorized by D-012 alone.
+
+## D-014 - Agent Tool-Use Execution Is Part of Qualification
+
+A local coding-agent configuration must be evaluated on its complete end-to-end execution behavior, including use of available repository tools, shell/tool compatibility with the host environment, repository inspection, scoped editing, testing, diff inspection, and accurate completion reporting. Repeated invented tool calls, incompatible command use, inspection loops, or failure to reach the authorized implementation/validation stages constitute qualification failures even when the underlying model has passed narrower coding tasks.
+
+Such a failure is evidence about the tested framework/model/rules/tool configuration. It must not be generalized into a universal claim about the model or framework, and it must not be repaired and reclassified as a benchmark success.
