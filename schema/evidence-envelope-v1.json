@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ai-legal.evidence.envelope.v1",
+  "title": "AI Legal Evidence Envelope v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "evidence_id",
+    "service",
+    "service_version",
+    "node_id",
+    "capture",
+    "time_context",
+    "artifacts",
+    "integrity",
+    "temporal_provenance",
+    "service_metadata",
+    "derivation",
+    "configuration"
+  ],
+  "properties": {
+    "schema": { "const": "ai-legal.evidence.envelope.v1" },
+    "evidence_id": { "type": "string", "minLength": 1 },
+    "service": { "type": "string", "minLength": 1 },
+    "service_version": { "type": "string", "minLength": 1 },
+    "node_id": { "type": "string", "minLength": 1 },
+    "capture": {
+      "type": "object",
+      "required": ["start", "end"],
+      "additionalProperties": true,
+      "properties": {
+        "start": { "type": ["string", "null"], "format": "date-time" },
+        "end": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "time_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_id",
+        "capture_utc",
+        "capture_monotonic_ns",
+        "device_id",
+        "selected_source",
+        "source_observation",
+        "uncertainty_ms",
+        "freshness",
+        "freshness_age_ms",
+        "synchronization_state",
+        "authority_id",
+        "authority_source",
+        "consistency_state",
+        "consistency_offset_ms",
+        "consistency_uncertainty_ms",
+        "consistency_threshold_ms",
+        "holdover_state",
+        "attestation_sequence",
+        "attestation_record_hash",
+        "attestation_signature"
+      ],
+      "properties": {
+        "context_id": { "$ref": "#/$defs/availableOrUnavailableUuid" },
+        "capture_utc": { "$ref": "#/$defs/availableOrUnavailableDateTime" },
+        "capture_monotonic_ns": { "$ref": "#/$defs/availableOrUnavailableInteger" },
+        "device_id": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "selected_source": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "source_observation": { "$ref": "#/$defs/availableOrUnavailableSourceObservation" },
+        "uncertainty_ms": { "$ref": "#/$defs/availableOrUnavailableNumber" },
+        "freshness": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "freshness_age_ms": { "$ref": "#/$defs/availableOrUnavailableNumber" },
+        "synchronization_state": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "authority_id": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "authority_source": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "consistency_state": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "consistency_offset_ms": { "$ref": "#/$defs/availableOrUnavailableNumber" },
+        "consistency_uncertainty_ms": { "$ref": "#/$defs/availableOrUnavailableNumber" },
+        "consistency_threshold_ms": { "$ref": "#/$defs/availableOrUnavailableNumber" },
+        "holdover_state": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "attestation_sequence": { "$ref": "#/$defs/availableOrUnavailableInteger" },
+        "attestation_record_hash": { "$ref": "#/$defs/availableOrUnavailableString" },
+        "attestation_signature": { "$ref": "#/$defs/availableOrUnavailableString" }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role"],
+        "additionalProperties": true,
+        "properties": {
+          "role": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["algorithm", "digests"],
+      "additionalProperties": true,
+      "properties": {
+        "algorithm": { "const": "sha256" },
+        "digests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target", "sha256"],
+            "additionalProperties": false,
+            "properties": {
+              "target": { "type": "string", "minLength": 1 },
+              "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "temporal_provenance": {
+      "type": "object",
+      "required": ["time_semantics"],
+      "additionalProperties": true,
+      "properties": {
+        "time_semantics": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 3,
+          "properties": {
+            "capture.start": { "$ref": "#/$defs/timeSemantics" },
+            "capture.end": { "$ref": "#/$defs/timeSemantics" },
+            "time_context.capture_utc": { "$ref": "#/$defs/timeSemantics" }
+          },
+          "required": ["capture.start", "capture.end", "time_context.capture_utc"]
+        }
+      }
+    },
+    "service_metadata": { "type": "object" },
+    "derivation": { "type": "object" },
+    "configuration": { "type": "object" }
+  },
+  "$defs": {
+    "unavailable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason_code"],
+      "properties": {
+        "status": { "const": "unavailable" },
+        "reason_code": {
+          "enum": ["not_available_to_service", "not_observed", "not_applicable"]
+        }
+      }
+    },
+    "availableOrUnavailableString": {
+      "oneOf": [
+        { "type": "string" },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "availableOrUnavailableInteger": {
+      "oneOf": [
+        { "type": "integer" },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "availableOrUnavailableNumber": {
+      "oneOf": [
+        { "type": "number" },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "availableOrUnavailableUuid": {
+      "oneOf": [
+        { "type": "string", "format": "uuid" },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "availableOrUnavailableDateTime": {
+      "oneOf": [
+        { "type": "string", "format": "date-time" },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "availableOrUnavailableSourceObservation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "source_id",
+            "source_type",
+            "utc",
+            "uncertainty_ms",
+            "valid",
+            "details",
+            "observed_monotonic_ns",
+            "observed_wall_utc"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source_id": { "type": "string" },
+            "source_type": { "type": "string" },
+            "utc": { "type": "string", "format": "date-time" },
+            "uncertainty_ms": { "type": "number" },
+            "valid": { "type": "boolean" },
+            "details": { "type": "object" },
+            "observed_monotonic_ns": { "type": "integer" },
+            "observed_wall_utc": { "type": "string", "format": "date-time" }
+          }
+        },
+        { "$ref": "#/$defs/unavailable" }
+      ]
+    },
+    "timeSemantics": {
+      "enum": ["context_acquisition", "physical_capture", "derived"]
+    }
+  }
+}

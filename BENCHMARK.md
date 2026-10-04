@@ -986,3 +986,25 @@ The reviewer confirmed the qualification boundary remained intact: HEAD stayed a
 The planning capability therefore remains **PASS / QUALIFIED**, but the overall TASK-AGENT-006 stage is **not implementation-approved**. No model or framework selection follows from this result.
 
 The next step is to resolve the architectural/contract decisions above and correct the plan before authorizing any implementation task. No service repository, `edge-ai/DECISIONS.md`, or GitHub `public` branch should be modified as part of this checkpoint.
+
+
+### TASK-AGENT-006 - Corrected Plan Revision Before Re-Review - 2026-10-04
+
+The independent reviewer rejected the first corrected plan as **REJECT / NOT READY**. The rejection was accepted as a valid qualification gate, not as a framework failure.
+
+The plan was revised to resolve the review blockers before any service implementation:
+
+- the exact 20 Capture Time Context members are now enumerated from the current edge-time `CaptureTimeContext` model;
+- the canonical contract is explicitly owned by edge-ai through `EVIDENCE_ENVELOPE_V1.md` and `schema/evidence-envelope-v1.json`;
+- the common validator is explicitly a language-neutral schema artifact, not a shared Python runtime package;
+- temporal-unavailable status and reason codes are fixed;
+- the controlled `time_semantics` vocabulary is fixed;
+- edge-audio envelope construction ownership is bounded to the existing finalized recorder/metadata path;
+- all 20 Capture Time Context members are required in the envelope and unavailable values are represented explicitly;
+- `capture.end` normalization and failure behavior are specified;
+- sidecar atomic-write and manifest-preservation behavior are specified;
+- populated temporal fixtures and malformed/unknown-major-version rejection are required.
+
+The decision record was also corrected so the decision identifiers are unique and the Evidence Envelope decisions are now D-012/D-013 after resolving the pre-existing duplicate D-010 numbering.
+
+No edge-video, edge-audio, edge-time, edge-controller, or GitHub `public` implementation changes are authorized by this revision. The next gate is an independent review of the corrected plan and contract artifacts.
