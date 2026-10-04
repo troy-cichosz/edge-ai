@@ -102,13 +102,13 @@ For edge-video, the existing app/evidence.py builder must be completed and wired
 
 For edge-audio, add the common envelope to the finalized evidence persistence path using the service's existing metadata flow.
 
-### 7. Capture end semantics
+### 7. Capture timestamp semantics
 
-For finalized evidence, envelope capture.end is derived from the service's recorded end_utc.
+For finalized evidence, envelope `capture.start` is the service's finalized capture start timestamp and MUST be a non-null RFC 3339 date-time value. A missing or unavailable finalized capture start is an implementation/validation error; this contract does not define a null or unavailable representation for `capture.start`.
 
-capture.end means the service's finalized capture end timestamp.
+Envelope `capture.end` is derived from the service's recorded `end_utc`. If the authoritative manifest has no `end_utc`, `capture.end` is null.
 
-It must not be described as physical exposure end unless the service can establish that fact.
+`capture.end` means the service's finalized capture end timestamp. It must not be described as physical exposure end unless the service can establish that fact.
 
 ### 8. Atomicity and failure behavior
 
