@@ -871,3 +871,50 @@ Independent validation established:
 Result: **Passed TASK-AGENT-003.** This establishes a successful OpenCode/qwen3-coder:30b multi-file Python implementation and test qualification for the tested configuration. It is an end-to-end observation of the tested OpenCode/qwen3-coder:30b configuration and is not treated as a universal claim about either OpenCode or qwen3-coder:30b. It does not by itself establish a final coding-model selection; cross-service, project-continuation, independent-review, and human-acceptance stages remain required.
 
 The disposable edge-video qualification worktree was not promoted to `chatgpt` or `public`.
+
+
+### TASK-AGENT-004 - Cross-Service Capture Time Contract
+
+TASK-AGENT-004 was run with OpenCode from disposable edge-time and edge-video worktrees at their authoritative GitHub `chatgpt` baselines.
+
+- edge-time baseline: `96459ebff3cb9cfd0d7e7cd03061dc632c65ba46`
+- edge-video baseline: `b1554cffb13b76cc6944c4cd92609e54b405adca`
+- The real service checkouts remained untouched.
+- The authorized change covered `edge-time/tests/test_context.py`, `edge-video/app/time.py`, and `edge-video/tests/test_evidence.py`.
+- The edge-video consumer was extended to the complete 20-field Capture Time Context contract.
+- Producer/consumer field validation established 20 fields on each side with no missing or extra fields.
+- The agent-modified edge-video suite passed 5 tests and `git diff --check` passed.
+- The agent made no commit or push and cleanup left only the intended benchmark changes.
+
+The agent initially described five edge-time test failures as pre-existing without first establishing a pristine baseline. A subsequent independent pristine run from the exact edge-time baseline produced the same five failures: two attestation/key-storage failures, two failures caused by the missing `role` test fixture attribute, and the freshness-state failure. Therefore the TASK-AGENT-004 implementation did not introduce those failures. Final qualification: **PASS / QUALIFIED**, with a reporting-process caveat that pre-existing attribution should be established by baseline evidence before being asserted.
+
+### TASK-AGENT-005 - Repository Continuation and State Accuracy
+
+TASK-AGENT-005 was run with OpenCode from disposable edge-video baseline `b1554cffb13b76cc6944c4cd92609e54b405adca`.
+
+The controlled task required repository and service-state inspection before editing, a narrowly scoped test-only change, preservation of existing behavior, complete validation, and accurate reporting. The only authorized repository change was `tests/test_evidence.py`.
+
+The agent:
+
+- established the detached baseline HEAD and clean starting state;
+- read the supplied read-only copy of the `edge-ai` agent rules after the framework initially attempted unauthorized access to `D:\\src\\edge-ai`;
+- read the available edge-video service/sprint documentation, implementation, tests, architecture documentation, and configuration;
+- correctly identified that the cross-repository `ai-legal-platform-development/PROJECT_STATUS.md` was not available inside the edge-video repository and reported that limitation rather than inventing its contents;
+- added one focused JSON write/read-back test using the existing `write_json_atomic` implementation;
+- changed only `tests/test_evidence.py` (+13 lines);
+- passed the focused evidence tests (3 passed) and the complete edge-video suite (4 passed);
+- inspected the complete diff and obtained `git diff --check` exit 0;
+- removed test-generated `__pycache__` directories without altering source files;
+- made no commit, push, branch mutation, or source-repository change.
+
+The run contained one recoverable edit-command syntax error before the successful edit. This did not alter the final repository result.
+
+Independent evaluation found the task result **PASS**. The final report was substantially accurate and appropriately distinguished unavailable information from verified facts. One minor reporting overclaim was identified: the agent stated that `.pytest_cache` existed before the task, although that pre-task condition was not independently established. The correct qualification is therefore **PASS**, with a minor reporting-precision caveat.
+
+### Current Qualification Checkpoint - 2026-10-04
+
+The controlled development-agent sequence has now established successful results for TASK-AGENT-002, TASK-AGENT-003, TASK-AGENT-004, and TASK-AGENT-005. These results establish practical capability evidence for the tested OpenCode configurations, but they do **not** constitute a final framework/model selection.
+
+The next qualification stage should test planning and independent review rather than continue accumulating small coding tasks. The intended next task is a controlled planning/review benchmark with no implementation promotion.
+
+No qualification worktree result has been promoted to GitHub `chatgpt` or `public`.
