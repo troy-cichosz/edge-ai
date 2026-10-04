@@ -31,11 +31,11 @@ Unknown additive members are permitted.
 
 ## 4. Capture
 
-`capture.start` is the finalized service capture start timestamp.
+`capture.start` is the finalized service capture start timestamp and MUST be a non-null RFC 3339 date-time value. A missing or unavailable finalized capture start is a validation/implementation error; this contract does not define a null or unavailable representation for `capture.start`.
 
 `capture.end` is the finalized service capture end timestamp derived from the authoritative `end_utc`. If the authoritative manifest has no `end_utc`, `capture.end` is null.
 
-Envelope timestamps use RFC 3339 date-time syntax. The serialized `capture.end` value MUST match the authoritative `end_utc` value exactly, including fractional-second precision.
+Envelope timestamps use RFC 3339 date-time syntax. The serialized `capture.start` value MUST represent the finalized service capture start. The serialized `capture.end` value MUST match the authoritative `end_utc` value exactly, including fractional-second precision.
 
 The envelope MUST NOT claim physical exposure timing unless the service's evidence establishes it.
 
