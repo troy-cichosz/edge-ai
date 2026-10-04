@@ -939,3 +939,50 @@ The plan was uploaded by the user to the edge-ai public branch for review/refere
 The next step is **TASK-AGENT-006 independent review**. The independent reviewer must inspect the plan against the actual repository state and supplied edge-audio snapshot, identify unsupported assumptions or missing requirements, and produce a review artifact without modifying implementation repositories or approving implementation by itself.
 
 No model, framework, or implementation has been selected or promoted as a result of TASK-AGENT-006.
+
+### TASK-AGENT-006 - Independent Review Checkpoint - 2026-10-04
+
+The independent review of TASK-AGENT-006 planning has completed against the actual disposable edge-video worktree and the supplied read-only edge-audio inspection snapshot.
+
+The reviewer produced `REVIEW-AGENT-006.md` only. The raw GitHub URL retrieval attempted before the review returned HTTP 404, but the planner output `PLAN-AGENT-006.md` was already present at the root of the qualification worktree and the reviewer successfully read that file. The prompted location had been `benchmark-inputs\\PLAN-AGENT-006.md`; the actual available plan location was the worktree root. This is recorded as a qualification-process path discrepancy, not as a failure of the substantive review.
+
+The reviewer independently verified the following important planner claims:
+
+- the edge-video baseline and detached worktree state;
+- the existing `build_evidence_envelope()` implementation and the fact that edge-video does not currently persist that envelope at runtime;
+- the difference between the video Capture Time Context validation set and the smaller audio requirement;
+- the audio temporal-unavailable representation;
+- the absence of audio `integrity` and `temporal_provenance` fields in the inspected envelope;
+- controller separation from the time-authority path;
+- the existing service-specific evidence/schema identifiers;
+- unavailable information was explicitly identified rather than invented.
+
+The reviewer also corrected one material planner overstatement: the plan said both services already emit `ai-legal.evidence.envelope.v1` envelopes, but edge-video has an envelope builder that is not currently invoked for runtime persistence. That distinction must be corrected before implementation.
+
+### TASK-AGENT-006 Independent Review Disposition
+
+**APPROVE WITH REQUIRED PLAN CORRECTIONS — NOT READY FOR IMMEDIATE IMPLEMENTATION.**
+
+The reviewer identified nine implementation blockers/decisions that must be resolved explicitly:
+
+1. canonical representation for temporal-unavailable state;
+2. required versus optional Capture Time Context fields;
+3. envelope persistence strategy: embedded metadata versus sidecar;
+4. controlled vocabulary for `time_semantics`;
+5. envelope v1 versioning and compatibility strategy;
+6. authoritative location of the common contract;
+7. whether the existing video envelope-builder deferral is intentional;
+8. exact scope of audio metadata atomicity;
+9. semantics of `capture.end`.
+
+The reviewer also identified test gaps that must be addressed in the corrected plan:
+
+- prove manifest-byte preservation when an envelope sidecar is added;
+- test durability behavior for manifest and envelope writes, including both-or-neither failure semantics where applicable;
+- use a shared contract validator with per-service fixtures for cross-service compatibility tests rather than coupling services to each other's readers.
+
+The reviewer confirmed the qualification boundary remained intact: HEAD stayed at the detached edge-video baseline, no source/test/docs/config changes were made by the reviewer, no commit/push/branch mutation occurred, and only the review artifact was created.
+
+The planning capability therefore remains **PASS / QUALIFIED**, but the overall TASK-AGENT-006 stage is **not implementation-approved**. No model or framework selection follows from this result.
+
+The next step is to resolve the architectural/contract decisions above and correct the plan before authorizing any implementation task. No service repository, `edge-ai/DECISIONS.md`, or GitHub `public` branch should be modified as part of this checkpoint.
