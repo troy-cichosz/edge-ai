@@ -44,7 +44,7 @@ Hard repository, branch, permission, and release boundaries must be enforced det
 
 The coding agent's own report is informational. Actual repository state, tests, diff inspection, and independent compliance/review evidence are authoritative for acceptance.
 
-## D-009 - Model Selection Is Replaceable
+## D-010 - Model Selection Is Replaceable
 
 Model names and versions may change as benchmarking identifies better local choices. Agent contracts and project rules must not depend on a single model vendor or model family.
 
