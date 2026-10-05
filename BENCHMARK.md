@@ -1038,3 +1038,15 @@ An earlier TASK-AGENT-006 invocation had accidentally displayed an OpenCode host
 Result: **Failed TASK-AGENT-006 implementation qualification for the tested OpenCode 2.0.19 + Ollama 0.34.4 + qwen3-coder:30b configuration.** The failure is specifically an end-to-end agent execution/tool-use qualification failure: the agent did not complete the authorized implementation and validation sequence. It is not evidence that qwen3-coder:30b cannot produce the required code in another framework or configuration, and it does not invalidate the earlier successful TASK-AGENT-002, TASK-AGENT-003, TASK-AGENT-004, or TASK-AGENT-005 observations.
 
 This result must remain a failed qualification record. The disposable worktree must not be repaired and promoted as a benchmark success. No final framework or model default is selected from this result.
+
+### TASK-AGENT-006 - Cline Implementation Qualification - 2026-10-05
+
+The same approved TASK-AGENT-006 implementation qualification was attempted with Cline in disposable edge-video and edge-audio worktrees. The local inference prerequisite was independently verified: Cline was configured for Ollama with `qwen3-coder:30b`, and `ollama ps` showed that model actively running. Cline's self-reported `llama3.2` value was inconsistent with the runtime evidence and was not used as the model identity. Auto-approval was limited to Read and Edit.
+
+The implementation qualification did not complete. Cline repeatedly operated from the edge-audio qualification worktree when the active implementation step required edge-video, attempted to access the sibling edge-video worktree, and repeatedly issued incompatible CMD/Unix syntax such as `cd /d`, `&&`, and `dir /s` under Windows PowerShell. The run was stopped rather than manually steered around these failures. Independent Git status checks showed the edge-audio Cline worktree remained clean at baseline `d24188f8ed6525c4a03a1b7a9a1ae7dd120a2dd9`; no implementation was produced or accepted.
+
+Result: **FAIL for the tested Cline local configuration.** This is an end-to-end agent execution/workspace-boundary failure, not a code-quality finding and not a universal judgment about Cline or `qwen3-coder:30b`.
+
+No authoritative `chatgpt` source, `public` branch, ADO repository, or service implementation was modified or promoted by the failed qualification. The disposable Cline worktrees remain frozen evidence.
+
+The next framework candidate is **OpenHands**. The previously planned Roo Code candidate is removed from the qualification sequence because Roo Code was shut down and its repository archived on 2026-05-15. The framework qualification path therefore proceeds to OpenHands rather than installing or qualifying a discontinued Roo Code release.
